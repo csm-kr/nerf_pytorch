@@ -20,7 +20,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     rays_o, rays_d, target_img = sample_rays_and_pixel(rays_o, rays_d, target_img, opts)  # [1024,3]
     pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # [1024,4]
 
-    # assign target_img
+    # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # update optimizer

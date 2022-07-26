@@ -67,18 +67,22 @@ def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_p
 
 
 def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
+    # 1. pre process : make (pts and dirs) (embedded)
     embedded, z_vals, rays_d = pre_process(rays, fn_posenc, fn_posenc_d, opts)
 
-    # assign to cuda
+    # ** assign to cuda **
     embedded = embedded.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     z_vals = z_vals.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     rays_d = rays_d.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
+    # 2. run model by net_chunk
     chunk = opts.net_chunk
     outputs_flat = torch.cat([model(embedded[i:i+chunk]) for i in range(0, embedded.shape[0], chunk)], 0)  # [net_c
     size = [z_vals.size(0), z_vals.size(1), 4]      # [4096, 64, 4]
     outputs = outputs_flat.reshape(size)
     # TODO FINE Network (N_f) (output : [1024, 192(coarse:64 + fine:128), 4])
+
+    # 3. post process : render each pixel color by formula (3) in nerf paper
     rgb_map, disp_map, acc_map, weights, depth_map = post_process(outputs, z_vals, rays_d)
     return rgb_map
 
