@@ -24,13 +24,9 @@ left top to right down 1000/ 50000/ 100000/ 150000 step
 
 ### TODO LIST
 
--[ ] Rendering
-
--[x] README.md
-
--[ ] quick start 
-
--[x] demonstrate 함수
-
--[ ] performance 설명
+- [ ] Rendering
+- [x] README.md
+- [ ] quick start 
+- [x] demonstrate render processing
+- [ ] performance
 
