@@ -60,31 +60,49 @@ def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_p
     num_whole_rays = flat_ray_o.size(0)
     rays = torch.cat((flat_ray_o, flat_ray_d), dim=-1)
 
-    ret = []
+    ret_coarse = []
+    ret_fine = []
+
     for i in range(0, num_whole_rays, opts.chunk):
-        ret.append(render_rays(rays[i:i+opts.chunk], model, fn_posenc, fn_posenc_d, opts))
-    return torch.cat(ret, dim=0)
+        rgb_dict = render_rays(rays[i:i+opts.chunk], model, fn_posenc, fn_posenc_d, opts)
+        if len(rgb_dict) > 1:
+            ret_coarse.append(rgb_dict['coarse'])
+            ret_fine.append(rgb_dict['fine'])
+            return torch.cat(ret_coarse, dim=0), torch.cat(ret_fine, dim=0)
+        else:
+            ret_coarse.append(rgb_dict['ret_coarse'])
+            return torch.cat(ret_coarse, dim=0), None
 
 
 def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
     # 1. pre process : make (pts and dirs) (embedded)
-    embedded, z_vals, rays_d = pre_process(rays, fn_posenc, fn_posenc_d, opts)
+    embedded, z_vals, rays_d, embedded_fine, z_vals_fine = pre_process(rays, fn_posenc, fn_posenc_d, opts)
 
     # ** assign to cuda **
     embedded = embedded.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     z_vals = z_vals.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     rays_d = rays_d.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
+    if embedded_fine is not None:
+        embedded_fine = embedded_fine.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
+        z_vals_fine = z_vals_fine.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # 2. run model by net_chunk
     chunk = opts.net_chunk
     outputs_flat = torch.cat([model(embedded[i:i+chunk]) for i in range(0, embedded.shape[0], chunk)], 0)  # [net_c
     size = [z_vals.size(0), z_vals.size(1), 4]      # [4096, 64, 4]
     outputs = outputs_flat.reshape(size)
-    # TODO FINE Network (N_f) (output : [1024, 192(coarse:64 + fine:128), 4])
+
+    if embedded_fine is not None:
+        outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk]) for i in range(0, embedded_fine.shape[0], chunk)], 0)
+        size_fine = [z_vals_fine.size(0), z_vals_fine.size(1), 4]  # [4096, 64, 4]
+        outputs_fine = outputs_fine_flat.reshape(size_fine)
 
     # 3. post process : render each pixel color by formula (3) in nerf paper
     rgb_map, disp_map, acc_map, weights, depth_map = post_process(outputs, z_vals, rays_d)
-    return rgb_map
+    if embedded_fine is not None:
+        rgb_map_fine, disp_map_fine, acc_map_fine, weights_fine, depth_map_fine = post_process(outputs_fine, z_vals_fine, rays_d)
+        return {'coarse': rgb_map, 'fine': rgb_map_fine}
+    return {'coarse': rgb_map}
 
 
 def pre_process(rays, fn_posenc, fn_posenc_d, opts):
@@ -101,7 +119,6 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     t_vals = torch.linspace(0., 1., steps=opts.N_samples)
     z_vals = near * (1.-t_vals) + far * (t_vals)
     z_vals = z_vals.expand([N_rays, opts.N_samples])
-
     mids = .5 * (z_vals[..., 1:] + z_vals[..., :-1])
     upper = torch.cat([mids, z_vals[..., -1:]], -1)
     lower = torch.cat([z_vals[..., :1], mids], -1)
@@ -118,7 +135,30 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     input_dirs_embedded = fn_posenc_d(input_dirs_flat)                    # [n_pts, 27]
 
     embedded = torch.cat([input_pts_embedded, input_dirs_embedded], -1)   # [n_pts, 90]
-    return embedded, z_vals, rays_d
+
+    if opts.N_importance > 0:  # it means there are fine samples
+        t_vals_fine = torch.linspace(0., 1., steps=opts.N_importance)  # 128
+        z_vals_fine = near * (1.-t_vals_fine) + far * (t_vals_fine)
+        z_vals_fine = z_vals_fine.expand([N_rays, opts.N_importance])
+        mids_fine = .5 * (z_vals_fine[..., 1:] + z_vals_fine[..., :-1])
+        upper_fine = torch.cat([mids_fine, z_vals_fine[..., -1:]], -1)
+        lower_fine = torch.cat([z_vals_fine[..., :1], mids_fine], -1)
+        t_rand_fine = torch.rand([N_rays, opts.N_importance])
+        z_vals_fine = lower_fine + (upper_fine - lower_fine) * t_rand_fine
+
+        input_pts_fine = rays_o.unsqueeze(1) + rays_d.unsqueeze(1) * z_vals_fine.unsqueeze(-1)
+        input_pts_fine_flat = input_pts_fine.view(-1, 3)  # [1024/4096, 64, 3] -> [65536/262144, 3]
+        input_pts_embedded_fine = fn_posenc(input_pts_fine_flat)  # [n_pts, 63]
+
+        input_dirs_fine = viewdirs.unsqueeze(1).expand(input_pts_fine.size())  # [4096, 3] -> [4096, 1, 3]-> [4096, 64, 3]
+        input_dirs_fine_flat = input_dirs_fine.reshape(-1, 3)  # [n_pts, 3]
+        input_dirs_embedded_fine = fn_posenc_d(input_dirs_fine_flat)  # [n_pts, 27]
+
+        embedded_fine = torch.cat([input_pts_embedded_fine, input_dirs_embedded_fine], -1)  # [n_pts, 90]
+
+        return embedded, z_vals, rays_d, embedded_fine, z_vals_fine
+
+    return embedded, z_vals, rays_d, None, None
 
 
 def post_process(outputs, z_vals, rays_d):
