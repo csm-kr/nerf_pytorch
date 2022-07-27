@@ -41,6 +41,10 @@ def main_worker(rank, opts):
     # 6. optimizer
     optimizer = torch.optim.Adam(params=model.parameters(), lr=opts.lr, betas=(0.9, 0.999))
 
+    # 7. scheduler
+    # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opts.N_iters, eta_min=5e-5)
+
     print('Begin')
     print('TRAIN views are', i_train)
     print('TEST views are', i_test)
@@ -59,6 +63,8 @@ def main_worker(rank, opts):
         if i % opts.save_step == 0 and i > 0:
             result_best_test = test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d,
                                              vis, criterion, result_best_test, opts)
+
+        scheduler.step()
 
     test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
 

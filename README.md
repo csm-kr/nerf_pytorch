@@ -6,6 +6,16 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ## Training
 
+- batch : 1024 (gtx 1080ti)
+- loss : MSE
+- dataset : Realistic Synthetic 360
+- iterations : 200k
+- optimizer : Adam
+- init lr : 5e-4
+- scheduler : ExponentialLR (upto 5e-5)
+- scheduler : CosineAnnealingLR (upto 5e-5)
+
+
 ## Results
 
 - quantitative results 
@@ -24,9 +34,11 @@ left top to right down 1000/ 50000/ 100000/ 150000 step
 
 ### TODO LIST
 
-- [ ] Rendering
 - [x] README.md
-- [ ] quick start 
-- [x] demonstrate render processing
-- [ ] performance
+- [x] Make coarse + fine network 
+- [x] Demonstrate render processing
+- [x] scheduler
+- [ ] Quick start 
+- [ ] Measure performance ssim and psnr
+- [ ] Rendering
 
