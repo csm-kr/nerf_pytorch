@@ -38,7 +38,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
         for i, test_pose in enumerate(tqdm(test_poses)):
 
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, test_pose[:3][:4])  # [1]
-            pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)
+            pred_rgb, _ = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)
 
             # SAVE test image
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])

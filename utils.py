@@ -65,13 +65,17 @@ def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_p
 
     for i in range(0, num_whole_rays, opts.chunk):
         rgb_dict = render_rays(rays[i:i+opts.chunk], model, fn_posenc, fn_posenc_d, opts)
-        if len(rgb_dict) > 1:
+
+        if opts.N_importance > 0:                    # use fine rays
             ret_coarse.append(rgb_dict['coarse'])
             ret_fine.append(rgb_dict['fine'])
-            return torch.cat(ret_coarse, dim=0), torch.cat(ret_fine, dim=0)
-        else:
+        else:                                        # use only coarse rays
             ret_coarse.append(rgb_dict['ret_coarse'])
-            return torch.cat(ret_coarse, dim=0), None
+
+    if opts.N_importance > 0:
+        return torch.cat(ret_coarse, dim=0), torch.cat(ret_fine, dim=0)
+    else:
+        return torch.cat(ret_coarse, dim=0), None
 
 
 def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
