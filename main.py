@@ -43,7 +43,7 @@ def main_worker(rank, opts):
 
     # 7. scheduler
     # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opts.N_iters, eta_min=5e-5)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opts.N_iters, eta_min=2e-4)
 
     print('Begin')
     print('TRAIN views are', i_train)

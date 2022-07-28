@@ -5,7 +5,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser(add_help=False)
 
     # visualization
-    parser.add_argument('--visdom_port', type=int, default=2022)
+    parser.add_argument('--visdom_port', type=int, default=2023)
 
     # etc
     parser.add_argument('--vis_step', type=int, default=100)
