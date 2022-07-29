@@ -48,7 +48,6 @@ def load_blender(data_root: str, data_name: str, half_res: bool, autodownload: b
     camera_angle_x = float(metas['train']['camera_angle_x'])
     focal = .5 * W / np.tan(.5 * camera_angle_x)
 
-    half_res = False         # FIXME
     if half_res:
         H = H//2
         W = W//2

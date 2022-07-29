@@ -10,7 +10,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
 
     # sample train index
     i_img = np.random.choice(i_train)
-    target_img = torch.from_numpy(images[i_img])
+    target_img = torch.from_numpy(images[i_img]).type(torch.float32)
     target_pose = torch.from_numpy(poses[i_img, :3, :4])
 
     img_h, img_w, img_k = hwk
