@@ -206,6 +206,7 @@ def pre_process_for_hierarchical(rays, z_vals, weights, fn_posenc, fn_posenc_d, 
     embedded = torch.cat([input_pts_embedded, input_dirs_embedded], -1)   # [n_pts, 90]
     return embedded, z_vals, rays_d
 
+
 def post_process(outputs, z_vals, rays_d):
     def raw2alpha(raw, dists, act_fn=F.relu): return 1. - torch.exp(-act_fn(raw)*dists)
     dists = z_vals[..., 1:] - z_vals[..., :-1]

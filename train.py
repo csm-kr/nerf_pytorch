@@ -18,7 +18,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     # make rays_o and rays_d
     rays_o, rays_d = make_o_d(img_w, img_h, img_k, target_pose)  # [800, 800, 3]
     rays_o, rays_d, target_img = sample_rays_and_pixel(rays_o, rays_d, target_img, opts)  # [1024,3]
-    pred_rgb, pred_rgb_fine = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # [1024,4]
+    pred_rgb_c, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # [1024,4]
 
     # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
@@ -30,8 +30,8 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     loss = img_loss
     psnr = mse2psnr(img_loss)
 
-    if pred_rgb_fine is not None:
-        img_loss0 = criterion(pred_rgb_fine, target_img)
+    if opts.N_importance > 0:
+        img_loss0 = criterion(pred_rgb_c, target_img)
         loss = loss + img_loss0
         psnr0 = mse2psnr(img_loss0)
 
