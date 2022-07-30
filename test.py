@@ -38,7 +38,8 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
         for i, test_pose in enumerate(tqdm(test_poses)):
 
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, test_pose[:3][:4])  # [1]
-            pred_rgb, _ = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)
+            _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # ** hierachicle sampling **
+            # https://github.com/yenchenlin/nerf-pytorch/blob/63a5a630c9abd62b0f21c08703d0ac2ea7d4b9dd/run_nerf.py#L403
 
             # SAVE test image
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])
