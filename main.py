@@ -3,7 +3,7 @@ import visdom
 import argparse
 
 # model
-from model import NeRF
+from model import NeRFs
 
 # dataset
 from blender import load_blender
@@ -33,7 +33,7 @@ def main_worker(rank, opts):
     # 4. model and PE
     fn_posenc, input_ch = get_positional_encoder(L=10)
     fn_posenc_d, input_ch_d = get_positional_encoder(L=4)
-    model = NeRF(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
+    model = NeRFs(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
 
     # 5. loss
     criterion = torch.nn.MSELoss()

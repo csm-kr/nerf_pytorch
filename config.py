@@ -18,7 +18,7 @@ def get_args_parser():
 
     # dataset
     parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/lego')
-    parser.add_argument('--name', type=str, default='lego_half_res_hierarchical')
+    parser.add_argument('--name', type=str, default='lego_hierarchical_nerfs')
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 12
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 15
