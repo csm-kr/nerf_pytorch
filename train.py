@@ -2,7 +2,7 @@ import os
 import time
 import torch
 import numpy as np
-from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_chunk, mse2psnr
+from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_chunk, mse2psnr, getSSIM, getLPIPS
 
 
 def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, optimizer, criterion,
@@ -29,6 +29,10 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
 
     loss = img_loss
     psnr = mse2psnr(img_loss)
+
+    # for image -> train 에서
+    # ssim = getSSIM()
+    # lpips = getLPIPS()
 
     if opts.N_importance > 0:
         img_loss0 = criterion(pred_rgb_c, target_img)

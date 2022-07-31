@@ -9,7 +9,7 @@ from blender import load_blender
 # model
 from model import NeRF
 from PE import get_positional_encoder
-from utils import mse2psnr, to8b, make_o_d, batchify_rays_and_render_by_chunk, img2mse
+from utils import mse2psnr, to8b, make_o_d, batchify_rays_and_render_by_chunk, img2mse, getSSIM, getLPIPS
 
 LOG_DIR = './logs'
 device = 0
@@ -55,9 +55,14 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
 
             loss = img_loss
             psnr = mse2psnr(img_loss)
+
+            target_img_hwc = target_img_flat.reshape(img_h, img_w, -1).type(torch.float32)
+            ssim = getSSIM(target_img_hwc, rgb)
+            lpips = getLPIPS(target_img_hwc, rgb)
+
             losses.append(img_loss)
             psnrs.append(psnr)
-            print('idx : {} | Loss : {} | PSNR : {}'.format(i, img_loss, psnr))
+            print('idx : {} | Loss : {:.6f} | PSNR : {:.4f} | SSIM : {:.4f} | LPIPS : {:.4f}'.format(i, img_loss, psnr.item(), ssim.item(), lpips))
 
             # save best result
             if result_best_test['psnr'] < psnr:

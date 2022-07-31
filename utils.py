@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from PIL import Image
 import torch.nn.functional as F
+from IQA_pytorch import SSIM, LPIPSvgg, DISTS
 
 
 def img2mse(x, y): return torch.mean((x - y) ** 2)
@@ -19,6 +20,20 @@ def saveNumpyImage(img):
     img = np.array(img) * 255
     im = Image.fromarray(img.astype(np.uint8))
     im.save('./logs'+'/white_bkgd_false.jpg')
+
+
+def getSSIM(pred, gt):
+    SSIM_ = SSIM(channels=3)
+    # [W,H,3]->[1,3,W,H]
+    return SSIM_(pred.permute(2, 0, 1).unsqueeze(0), gt.permute(2, 0, 1).unsqueeze(0), as_loss=False)
+
+
+def getLPIPS(pred, gt):
+    device = pred.get_device()
+    LPIPS_ = LPIPSvgg(channels=3).to(device)
+    # loss_lpips = LLPIS_(rgb.permute(2, 0, 1).unsqueeze(0), test_imgs[i].permute(2, 0, 1).unsqueeze(0))
+    # LPIPS_ = lpips.LPIPS(net='vgg')
+    return LPIPS_(pred.permute(2, 0, 1), gt.permute(2, 0, 1))
 
 
 def make_o_d(img_w, img_h, img_k, pose):
