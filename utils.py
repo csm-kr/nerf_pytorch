@@ -7,7 +7,9 @@ import torch.nn.functional as F
 def img2mse(x, y): return torch.mean((x - y) ** 2)
 
 
-def mse2psnr(x): return -10. * torch.log(x) / torch.log(torch.Tensor([10.])).cuda()
+def mse2psnr(x):
+    device = x.get_device()
+    return -10. * torch.log(x) / torch.log(torch.Tensor([10.])).to(device)
 
 
 def to8b(x): return (255*np.clip(x, 0, 1)).astype(np.uint8)
@@ -221,7 +223,7 @@ def post_process(outputs, z_vals, rays_d):
     alpha = raw2alpha(outputs[..., 3], dists)  # [N_rays, N_samples]
 
     # Density(alpha) X Transmittance
-    transmittance = torch.cumprod(torch.cat([torch.ones((alpha.shape[0], 1)).cuda(), 1.-alpha + 1e-10], -1), -1)[:, :-1]
+    transmittance = torch.cumprod(torch.cat([torch.ones((alpha.shape[0], 1)).to(device), 1.-alpha + 1e-10], -1), -1)[:, :-1]
     weights = alpha * transmittance
 
     rgb_map = torch.sum(weights.unsqueeze(-1) * rgb_sigmoid, -2)  # [N_rays, 3]
