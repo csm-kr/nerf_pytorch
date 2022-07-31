@@ -87,7 +87,7 @@ def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_p
             ret_coarse.append(rgb_dict['coarse'])
             ret_fine.append(rgb_dict['fine'])
         else:                                        # use only coarse rays
-            ret_coarse.append(rgb_dict['ret_coarse'])
+            ret_coarse.append(rgb_dict['coarse'])
 
     if opts.N_importance > 0:
         return torch.cat(ret_coarse, dim=0), torch.cat(ret_fine, dim=0)
@@ -124,7 +124,7 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
         # rays_d = rays_d.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
         # 5. run model by net_chunk
-        outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk]) for i in range(0, embedded_fine.shape[0], chunk)], 0)
+        outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk], is_fine=True) for i in range(0, embedded_fine.shape[0], chunk)], 0)
         size_fine = [z_vals_fine.size(0), z_vals_fine.size(1), 4]  # [4096, 64, 4]
         outputs_fine = outputs_fine_flat.reshape(size_fine)
 

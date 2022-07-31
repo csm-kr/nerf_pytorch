@@ -30,7 +30,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     loss = img_loss
     psnr = mse2psnr(img_loss)
 
-    # for image -> train 에서
+    # for image -> at test.py
     # ssim = getSSIM()
     # lpips = getLPIPS()
 
