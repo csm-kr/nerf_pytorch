@@ -125,7 +125,7 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
 
         # 5. run model by net_chunk
         outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk], is_fine=True) for i in range(0, embedded_fine.shape[0], chunk)], 0)
-        size_fine = [z_vals_fine.size(0), z_vals_fine.size(1), 4]  # [4096, 64, 4]
+        size_fine = [z_vals_fine.size(0), z_vals_fine.size(1), 4]  # [4096, 64 + 128, 4]
         outputs_fine = outputs_fine_flat.reshape(size_fine)
 
         # 6. post process : render each pixel color by formula (3) in nerf paper

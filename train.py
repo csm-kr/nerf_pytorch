@@ -51,13 +51,19 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     if i % opts.vis_step == 0:
         # print
         print('Step: [{0}/{1}]\t'
+              'Loss_c: {loss_c:.4f}\t'
+              'Loss_f: {loss_f:.4f}\t'
               'Loss: {loss:.4f}\t'
-              'PSNR: {psnr:.4f}\t'
+              'PSNR_c: {psnr_c:.4f}\t'
+              'PSNR_f: {psnr_f:.4f}\t'
               'Learning rate: {lr:.7f} s \t'
               .format(i,
                       opts.N_iters,
+                      loss_c=img_loss0,
+                      loss_f=img_loss,
                       loss=loss,
-                      psnr=psnr.item(),
+                      psnr_c=psnr0.item(),
+                      psnr_f=psnr.item(),
                       lr=lr))
 
         # visdom

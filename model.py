@@ -62,9 +62,10 @@ class NeRFs(nn.Module):
 
 
 if __name__ == "__main__":
-    device_ids = [0]
-    device = torch.device('cuda:{}'.format(min(device_ids)) if torch.cuda.is_available() else 'cpu')
-    model = NeRF(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
-    input_test = torch.rand(65536, 90).to(device)       # torch.Size([65536, 63+27])
-    result_test = model(input_test)
+    # device_ids = [0]
+    # device = torch.device('cuda:{}'.format(min(device_ids)) if torch.cuda.is_available() else 'cpu')
+    model = NeRFs(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4])# .to(device)
+    input_test = torch.rand(65536, 90) # .to(device)       # torch.Size([65536, 63+27])
+    result_test = model(input_test, is_fine=True)
     print(result_test.shape)
+    print(model.parameters())
