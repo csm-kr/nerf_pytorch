@@ -153,6 +153,8 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     mids = .5 * (z_vals[..., 1:] + z_vals[..., :-1])
     upper = torch.cat([mids, z_vals[..., -1:]], -1)
     lower = torch.cat([z_vals[..., :1], mids], -1)
+    if opts.is_test:
+        torch.manual_seed(opts.seed)
     t_rand = torch.rand([N_rays, opts.N_samples])
     z_vals = lower + (upper-lower) * t_rand
 
@@ -166,37 +168,6 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     input_dirs_embedded = fn_posenc_d(input_dirs_flat)                    # [n_pts, 27]
 
     embedded = torch.cat([input_pts_embedded, input_dirs_embedded], -1)   # [n_pts, 90]
-
-    # if opts.N_importance > 0:  # it means there are fine samples
-    #
-    #     z_vals_mid = .5 * (z_vals[..., 1:] + z_vals[..., :-1])
-    #     z_samples = sample_pdf(z_vals_mid, weights[..., 1:-1], opts.N_importance, det=(opts.perturb==0.))
-    #     z_samples = z_samples.detach()
-    #
-    #     z_vals, _ = torch.sort(torch.cat([z_vals, z_samples], -1), -1)
-    #     pts = rays_o[..., None, :] + rays_d[..., None, :] * z_vals[..., :, None] # [N_rays, N_samples + N_importance, 3]
-    #
-    #     t_vals_fine = torch.linspace(0., 1., steps=opts.N_importance)  # 128
-    #     z_vals_fine = near * (1.-t_vals_fine) + far * (t_vals_fine)
-    #     z_vals_fine = z_vals_fine.expand([N_rays, opts.N_importance])
-    #     mids_fine = .5 * (z_vals_fine[..., 1:] + z_vals_fine[..., :-1])
-    #     upper_fine = torch.cat([mids_fine, z_vals_fine[..., -1:]], -1)
-    #     lower_fine = torch.cat([z_vals_fine[..., :1], mids_fine], -1)
-    #     t_rand_fine = torch.rand([N_rays, opts.N_importance])
-    #     z_vals_fine = lower_fine + (upper_fine - lower_fine) * t_rand_fine
-    #
-    #     input_pts_fine = rays_o.unsqueeze(1) + rays_d.unsqueeze(1) * z_vals_fine.unsqueeze(-1)
-    #     input_pts_fine_flat = input_pts_fine.view(-1, 3)  # [1024/4096, 64, 3] -> [65536/262144, 3]
-    #     input_pts_embedded_fine = fn_posenc(input_pts_fine_flat)  # [n_pts, 63]
-    #
-    #     input_dirs_fine = viewdirs.unsqueeze(1).expand(input_pts_fine.size())  # [4096, 3] -> [4096, 1, 3]-> [4096, 64, 3]
-    #     input_dirs_fine_flat = input_dirs_fine.reshape(-1, 3)  # [n_pts, 3]
-    #     input_dirs_embedded_fine = fn_posenc_d(input_dirs_fine_flat)  # [n_pts, 27]
-    #
-    #     embedded_fine = torch.cat([input_pts_embedded_fine, input_dirs_embedded_fine], -1)  # [n_pts, 90]
-    #
-    #     return embedded, z_vals, rays_d, embedded_fine, z_vals_fine
-
     return embedded, z_vals, rays_d
 
 
@@ -207,7 +178,7 @@ def pre_process_for_hierarchical(rays, z_vals, weights, fn_posenc, fn_posenc_d, 
     viewdirs = viewdirs / torch.norm(viewdirs, dim=-1, keepdim=True)  # make normal vector
 
     z_vals_mid = .5 * (z_vals[..., 1:] + z_vals[..., :-1])
-    z_samples = sample_pdf(z_vals_mid, weights[..., 1:-1], opts.N_importance, det=(opts.perturb == 0.))
+    z_samples = sample_pdf(z_vals_mid, weights[..., 1:-1], opts.N_importance, det=(opts.perturb == 0.), opts=opts)
     z_samples = z_samples.detach()
     z_vals, _ = torch.sort(torch.cat([z_vals, z_samples], -1), -1)
 
@@ -251,7 +222,11 @@ def post_process(outputs, z_vals, rays_d):
 
 
 # Hierarchical sampling (section 5.2)
-def sample_pdf(bins, weights, N_samples, det=False, pytest=False):
+def sample_pdf(bins, weights, N_samples, det=False, opts=None):
+
+    # assert 가 맞으면 넘어감
+    assert opts is not None
+
     # Get pdf
     weights = weights + 1e-5  # prevent nans
     pdf = weights / torch.sum(weights, -1, keepdim=True)
@@ -263,18 +238,10 @@ def sample_pdf(bins, weights, N_samples, det=False, pytest=False):
         u = torch.linspace(0., 1., steps=N_samples)
         u = u.expand(list(cdf.shape[:-1]) + [N_samples])
     else:
+        if opts.is_test:
+            torch.manual_seed(opts.seed)
         u = torch.rand(list(cdf.shape[:-1]) + [N_samples])
 
-    # Pytest, overwrite u with numpy's fixed random numbers
-    if pytest:
-        np.random.seed(0)
-        new_shape = list(cdf.shape[:-1]) + [N_samples]
-        if det:
-            u = np.linspace(0., 1., N_samples)
-            u = np.broadcast_to(u, new_shape)
-        else:
-            u = np.random.rand(*new_shape)
-        u = torch.Tensor(u)
 
     # Invert CDF
     device = cdf.get_device()

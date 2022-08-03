@@ -106,7 +106,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
 
 def main_worker(rank, opts):
 
-    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
+    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
     i_train, i_val, i_test = i_split
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     vis = None

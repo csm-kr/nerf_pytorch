@@ -5,7 +5,7 @@ import imageio
 import numpy as np
 
 
-def load_blender(data_root: str, data_name: str, half_res: bool, autodownload: bool = True, testskip: int = 8, bkg_white: bool = True):
+def load_blender(data_root: str, data_name: str, half_res: bool, testskip: int = 8, bkg_white: bool = True):
     print(f"\n\nLoading Dataset {data_name}, from {data_root}")
     splits = ['train', 'val', 'test']
     metas = {}
