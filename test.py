@@ -4,31 +4,34 @@ import torch
 import imageio
 import numpy as np
 from tqdm import tqdm
+
+# parser
+import argparse
+from config import get_args_parser
 # dataset
 from blender import load_blender
 # model
-from model import NeRF
+from model import NeRFs
 from PE import get_positional_encoder
 from utils import mse2psnr, to8b, make_o_d, batchify_rays_and_render_by_chunk, img2mse, getSSIM, getLPIPS
-
-LOG_DIR = './logs'
-device = 0
 
 
 def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts):
 
     print('Start Testing for idx'.format(i))
     model.eval()
-    checkpoint = torch.load(os.path.join(LOG_DIR, opts.name, opts.name+'_{}.pth.tar'.format(i)))
+    checkpoint = torch.load(os.path.join(opts.log_dir, opts.name, opts.name+'_{}.pth.tar'.format(i)))
     model.load_state_dict(checkpoint['model_state_dict'])
 
-    save_test_dir = os.path.join(LOG_DIR, opts.name, opts.name+'_{}'.format(i), 'test_result')
+    save_test_dir = os.path.join(opts.log_dir, opts.name, opts.name+'_{}'.format(i), 'test_result')
     os.makedirs(save_test_dir, exist_ok=True)
 
     img_h, img_w, img_k = hwk
 
     losses = []
     psnrs = []
+    ssims = []
+    lpipses = []
 
     test_imgs =torch.from_numpy(images[i_test])
     test_poses = torch.from_numpy(poses[i_test])
@@ -60,58 +63,61 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
             ssim = getSSIM(target_img_hwc, rgb)
             lpips = getLPIPS(target_img_hwc, rgb)
 
-            losses.append(img_loss)
-            psnrs.append(psnr)
-            print('idx : {} | Loss : {:.6f} | PSNR : {:.4f} | SSIM : {:.4f} | LPIPS : {:.4f}'.format(i, img_loss, psnr.item(), ssim.item(), lpips))
+            # tensor to float
+            losses.append(img_loss.cpu().item())
+            psnrs.append(psnr.cpu().item())
+            ssims.append(ssim.cpu().item())
+            lpipses.append(lpips.cpu().item())
+
+            print('idx : {} | Loss : {:.6f} | PSNR : {:.4f} | SSIM : {:.4f} | LPIPS : {:.4f}'.format(i, img_loss.item(),
+                                                                                                     psnr.item(),
+                                                                                                     ssim.item(),
+                                                                                                     lpips.item()))
 
             # save best result
             if result_best_test['psnr'] < psnr:
                 result_best_test['i'] = i
-                result_best_test['loss'] = loss
-                result_best_test['psnr'] = psnr
+                result_best_test['loss'] = loss.item()
+                result_best_test['psnr'] = psnr.item()
+                result_best_test['ssim'] = ssim.item()
+                result_best_test['lpips'] = lpips.item()
 
-    print('BEST Result for Testing) idx : {} , LOSS : {} , PSNR : {}'.format(
-        result_best_test['i'], result_best_test['loss'], result_best_test['psnr']))
+    losses = np.array(losses)
+    psnrs = np.array(psnrs)
+    ssims = np.array(ssims)
+    lpipses = np.array(lpipses)
 
+    # print('(BEST Result for Testing) idx : {} , LOSS : {} , PSNR : {}'.format(result_best_test['i'], result_best_test['loss'], result_best_test['psnr']))
+    print('(MEAN Result for Testing) LOSS : {:.6f} , PSNR : {:.4f} , SSIM : {:.4f}, LPIPS : {:.4f}'.format(losses.mean(),
+                                                                                                           psnrs.mean(),
+                                                                                                           ssims.mean(),
+                                                                                                           lpipses.mean()))
     f = open(os.path.join(save_test_dir, "_result.txt"), 'w')
     for i in range(len(losses)):
-        line = 'idx:{}\tloss:{}\tpsnr:{}\n'.format(i, losses[i], psnrs[i])
+        line = 'idx:{}\t loss:{:.6f}\t psnr:{:.4f}\t ssim:{:.4f}\t lpips:{:.4f}\n'.format(i, losses[i], psnrs[i], ssims[i], lpipses[i])
         f.write(line)
+    line = '*mean*   loss:{:.6f}\t psnr:{:.4f}\t ssim:{:.4f}\t lpips:{:.4f}\n'.format(losses.mean(), psnrs.mean(),
+                                                                                      ssims.mean(), lpipses.mean())
+    f.write(line)
     f.close()
 
     return result_best_test
 
 
-def main_worker(rank, cfg):
+def main_worker(rank, opts):
 
-    images, poses, hwk, i_split = load_blender(cfg.root, cfg.name, cfg.half_res, cfg.white_bkgd)
+    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
     i_train, i_val, i_test = i_split
-    img_h, img_w, img_k = hwk
-
-    vis=None
+    device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
+    vis = None
 
     fn_posenc, input_ch = get_positional_encoder(L=10)
     fn_posenc_d, input_ch_d = get_positional_encoder(L=4)
-    # output_ch = 5 if cfg.model.n_importance > 0 else 4
 
-    skips = [4]
-    model = NeRF(D=8, W=256,
-                 input_ch=input_ch, input_ch_d=input_ch_d, skips=skips).to(device)
-
+    model = NeRFs(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
     criterion = torch.nn.MSELoss()
-    result_best_test = {'i': 0, 'loss': 0, 'psnr': 0}
-
-    # test_and_eval(idx='best',
-    #              fn_posenc=fn_posenc,
-    #              fn_posenc_d=fn_posenc_d,
-    #              model=model,
-    #              test_imgs=torch.Tensor(images[i_test]),
-    #              test_poses=torch.Tensor(poses[i_test]),
-    #              hwk=hwk,
-    #              cfg=cfg)
-
+    result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
     test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
-
     # render(idx='best',
     #        fn_posenc=fn_posenc,
     #        fn_posenc_d=fn_posenc_d,
@@ -121,9 +127,8 @@ def main_worker(rank, cfg):
 
 
 if __name__ == '__main__':
-    import argparse
-    from config import get_args_parser
-    parser = argparse.ArgumentParser('nerf lego training', parents=[get_args_parser()])
+
+    parser = argparse.ArgumentParser('nerf lego testing', parents=[get_args_parser()])
     opts = parser.parse_args()
 
     opts.world_size = len(opts.gpu_ids)

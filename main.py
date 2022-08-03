@@ -27,7 +27,7 @@ def main_worker(rank, opts):
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # 3. dataset
-    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.white_bkgd)
+    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
     i_train, i_val, i_test = i_split
 
     # 4. model and PE

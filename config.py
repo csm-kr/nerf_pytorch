@@ -15,6 +15,7 @@ def get_args_parser():
     parser.add_argument('--start_epoch', type=int, default=0)
     parser.add_argument('--save_path', type=str, default='./save')
     parser.add_argument('--save_file_name', type=str, default='nerf_lego')
+    parser.add_argument('--log_dir', type=str, default='./logs')
 
     # dataset
     parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/lego')
@@ -28,13 +29,14 @@ def get_args_parser():
     parser.add_argument('--num_workers', type=int, default=0)
 
     # training
-    parser.add_argument('--N_iters', type=int, default=200000)
+    parser.add_argument('--N_iters', type=int, default=200001)
     parser.add_argument("--N_samples", type=int, default=64, help='number of coarse samples per ray')
     parser.add_argument("--N_importance", type=int, default=128, help='number of additional fine samples per ray')
     parser.add_argument("--perturb", type=float, default=1., help='set to 0. for no jitter, 1. for jitter')
     parser.add_argument("--use_viewdirs", type=bool, default=True, help='use full 5D input instead of 3D')
     parser.add_argument("--white_bkgd", type=bool, default=True, help='set to render synthetic data on a white bkgd (always use for dvoxels)')
     parser.add_argument("--half_res", type=bool, default=True, help='load blender synthetic data at 400x400 instead of 800x800')
+    parser.add_argument("--testskip", type=int, default=8, help='among 200 test dataset, skip number e.g. 8 -> 200//8 = 25')
     parser.add_argument("--precrop_iters", type=int, default=500)
 
     # for multi-gpu
