@@ -81,7 +81,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
                   'model_state_dict': model.state_dict(),
                   'optimizer_state_dict': optimizer.state_dict()}
 
-    save_path = os.path.join('./logs', opts.name)
+    save_path = os.path.join(opts.log_dir, opts.name)
     os.makedirs(save_path, exist_ok=True)
 
     if i % opts.save_step == 0 and i > 0:

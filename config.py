@@ -13,8 +13,6 @@ def get_args_parser():
 
     # save
     parser.add_argument('--start_epoch', type=int, default=0)
-    parser.add_argument('--save_path', type=str, default='./save')
-    parser.add_argument('--save_file_name', type=str, default='nerf_lego')
     parser.add_argument('--log_dir', type=str, default='./logs')
 
     # dataset
@@ -60,8 +58,4 @@ if __name__ == '__main__':
     opts.num_workers = len(opts.gpu_ids) * 4
 
     print(opts)
-    # main_worker(opts.rank, opts)
-    # mp.spawn(main_worker,
-    #          args=(opts,),
-    #          nprocs=opts.world_size,
-    #          join=True)
+
