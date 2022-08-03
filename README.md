@@ -26,6 +26,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - qualitative results
 
 ![](./figures/000.png)
+![lego_gif](./figures/lego.gif)
 
 
 ### TODO LIST
