@@ -16,14 +16,15 @@ def get_args_parser():
     parser.add_argument('--log_dir', type=str, default='./logs')
 
     # dataset
+    # FIXME
     parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/lego')
     parser.add_argument('--name', type=str, default='lego_hierarchical_nerfs')
     parser.add_argument("--lr", type=float, default=5e-4)
-    parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 12
-    parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 15
+    parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
+    parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
     parser.add_argument('--net_chunk', type=int, default=65536)  # 2 ^ 16
-    parser.add_argument('--near', type=int, default=2)  # 2 ^ 16
-    parser.add_argument('--far', type=int, default=6)  # 2 ^ 16
+    parser.add_argument('--near', type=int, default=2)
+    parser.add_argument('--far', type=int, default=6)
     parser.add_argument('--num_workers', type=int, default=0)
 
     # training
@@ -41,6 +42,11 @@ def get_args_parser():
     parser.add_argument('--seed', type=int, default=0)
     parser.set_defaults(is_test=False)
     parser.add_argument('--testing', dest='is_test', action='store_true')
+
+    # rendering
+    parser.add_argument('--n_angle', type=int, default=40)
+    parser.add_argument('--single_angle', type=int, default=-1)
+    parser.add_argument('--phi', type=float, default=-30.0)
 
     # for multi-gpu
     parser.add_argument('--gpu_ids', nargs="+", default=['0'])   # usage : --gpu_ids 0, 1, 2, 3

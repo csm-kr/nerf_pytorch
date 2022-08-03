@@ -14,6 +14,8 @@ from blender import load_blender
 from model import NeRFs
 from PE import get_positional_encoder
 from utils import mse2psnr, to8b, make_o_d, batchify_rays_and_render_by_chunk, img2mse, getSSIM, getLPIPS
+# render
+from render import render
 
 
 def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts):
@@ -87,7 +89,6 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
     ssims = np.array(ssims)
     lpipses = np.array(lpipses)
 
-    # print('(BEST Result for Testing) idx : {} , LOSS : {} , PSNR : {}'.format(result_best_test['i'], result_best_test['loss'], result_best_test['psnr']))
     print('(MEAN Result for Testing) LOSS : {:.6f} , PSNR : {:.4f} , SSIM : {:.4f}, LPIPS : {:.4f}'.format(losses.mean(),
                                                                                                            psnrs.mean(),
                                                                                                            ssims.mean(),
@@ -104,7 +105,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
     return result_best_test
 
 
-def main_worker(rank, opts):
+def test_worker(rank, opts):
 
     images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
     i_train, i_val, i_test = i_split
@@ -118,12 +119,7 @@ def main_worker(rank, opts):
     criterion = torch.nn.MSELoss()
     result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
     test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
-    # render(idx='best',
-    #        fn_posenc=fn_posenc,
-    #        fn_posenc_d=fn_posenc_d,
-    #        model=model,
-    #        hwk=hwk,
-    #        cfg=cfg)
+    render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1)
 
 
 if __name__ == '__main__':
@@ -135,4 +131,4 @@ if __name__ == '__main__':
     opts.num_workers = len(opts.gpu_ids) * 4
 
     print(opts)
-    main_worker(0, opts)
+    test_worker(0, opts)
