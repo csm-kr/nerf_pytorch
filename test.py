@@ -51,7 +51,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
             rgb_np = rgb.cpu().numpy()
 
             rgb8 = to8b(rgb_np)
-            savefilename = os.path.join(save_test_dir, '{:03d}.png'.format(i))
+            savefilename = os.path.join(save_test_dir, '{}_{:03d}.png'.format(opts.name, i))
             imageio.imwrite(savefilename, rgb8)
 
             # GET loss & psnr

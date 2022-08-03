@@ -53,18 +53,21 @@ def main_worker(rank, opts):
     start = start + 1
 
     result_best = {'i': 0, 'loss': 0, 'psnr': 0}
-    result_best_test = {'i': 0, 'loss': 0, 'psnr': 0}
+    result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
 
     for i in range(start, opts.N_iters):
-
+        # train
         result_best = train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d,
                                        vis, optimizer, criterion, result_best, opts)
+
+        # test and render
         if i % opts.save_step == 0 and i > 0:
             result_best_test = test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d,
                                              vis, criterion, result_best_test, opts)
 
         scheduler.step()
 
+    # test and render at best index
     test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
 
 

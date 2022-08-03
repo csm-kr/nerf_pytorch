@@ -97,8 +97,8 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
         rgbs = np.stack(rgbs, 0)
 
     if single_angle == -1:
-        imageio.mimwrite(os.path.join(save_render_dir, "rgb.mp4"), to8b(rgbs), fps=30, quality=8)
-        imageio.mimwrite(os.path.join(save_render_dir, "rgb.gif"), to8b(rgbs), duration=0.04)
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.mp4".format(opts.name)), to8b(rgbs), fps=30, quality=8)
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.gif".format(opts.name)), to8b(rgbs), duration=0.04)
 
 
 def render_worker(rank, opts):
