@@ -37,7 +37,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - [x] scheduler
 - [x] Half version 
 - [x] Measure performance ssim, psnr and lpips
-- [ ] Rendering
+- [x] Rendering
 - [ ] Quick start 
 
 

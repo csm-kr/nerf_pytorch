@@ -73,7 +73,7 @@ def main_worker(rank, opts):
 
 if __name__ == '__main__':
     from config import get_args_parser
-    parser = argparse.ArgumentParser('nerf lego training', parents=[get_args_parser()])
+    parser = argparse.ArgumentParser('nerf training', parents=[get_args_parser()])
     opts = parser.parse_args()
     opts.world_size = len(opts.gpu_ids)
     opts.num_workers = len(opts.gpu_ids) * 4

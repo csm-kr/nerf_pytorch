@@ -7,6 +7,7 @@ from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_c
 
 def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, optimizer, criterion,
                      result_best, opts):
+    model.train()
 
     # sample train index
     i_img = np.random.choice(i_train)
@@ -16,33 +17,31 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     img_h, img_w, img_k = hwk
 
     # make rays_o and rays_d
-    rays_o, rays_d = make_o_d(img_w, img_h, img_k, target_pose)  # [800, 800, 3]
+    rays_o, rays_d = make_o_d(img_w, img_h, img_k, target_pose)                           # [400, 400, 3]
     rays_o, rays_d, target_img = sample_rays_and_pixel(rays_o, rays_d, target_img, opts)  # [1024,3]
-    pred_rgb_c, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # [1024,4]
+    pred_rgb_c, pred_rgb_f = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)  # [1024,4]
 
     # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # update optimizer
     optimizer.zero_grad()
-    img_loss = criterion(pred_rgb, target_img)
+    img_loss_f = criterion(pred_rgb_f, target_img)
+    psnr_f = mse2psnr(img_loss_f)
 
-    loss = img_loss
-    psnr = mse2psnr(img_loss)
-
-    # for image -> at test.py
+    # getting ssim and lpips for image -> at test.py
     # ssim = getSSIM()
     # lpips = getLPIPS()
 
-    if opts.N_importance > 0:
-        img_loss0 = criterion(pred_rgb_c, target_img)
-        loss = loss + img_loss0
-        psnr0 = mse2psnr(img_loss0)
+    img_loss_c = criterion(pred_rgb_c, target_img)
+    psnr_c = mse2psnr(img_loss_c)
+
+    loss = img_loss_c + img_loss_f
 
     loss.backward()
     optimizer.step()
 
-    toc = time.time()
+    psnr = psnr_f
 
     for param_group in optimizer.param_groups:
         lr = param_group['lr']
@@ -59,11 +58,11 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
               'Learning rate: {lr:.7f} s \t'
               .format(i,
                       opts.N_iters,
-                      loss_c=img_loss0,
-                      loss_f=img_loss,
+                      loss_c=img_loss_c,
+                      loss_f=img_loss_f,
                       loss=loss,
-                      psnr_c=psnr0.item(),
-                      psnr_f=psnr.item(),
+                      psnr_c=psnr_c.item(),
+                      psnr_f=psnr_f.item(),
                       lr=lr))
 
         # visdom
