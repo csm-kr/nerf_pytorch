@@ -19,14 +19,15 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 ## Results
 
 - quantitative results 
-| data  | exp   | model                 | Batch size     | res        |  PSNR   |  SSIM  | LPIPS  | Loss   | 
-|-------|-------|-----------------------|----------------|------------|---------|--------|--------|--------|
-| lego  | 0803  | c(64) + 192(c+f)      | 1024           |400 x 400   | 31.0703 | 0.9597 | 0.0435 |0.000818|
+
+| data  | exp   | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
+|-------|-------|--------------------|----------------|------------|---------|--------|--------|----------|
+| lego  | 0803  | Hierarchical       | 1024           | 400 x 400  | 31.0703 | 0.9597 | 0.0435 | 0.000818 |
 
 - qualitative results
-left top to right down 1000/ 50000/ 100000/ 150000 step
 
-![](./figures/results_1000_50000_100000_1500000.JPG)
+![](./figures/000.png)
+
 
 ### TODO LIST
 
