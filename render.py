@@ -1,18 +1,18 @@
 import os
-import numpy as np
 import torch
-import time
-from tqdm import tqdm, trange
-import imageio
-import visdom
+import numpy as np
 
+import visdom
+import imageio
+from tqdm import tqdm, trange
+
+# data
+from blender import load_blender
+
+# model
 from PE import get_positional_encoder
 from model import NeRFs
-from blender import load_blender
 from utils import to8b, batchify_rays_and_render_by_chunk, make_o_d
-
-import torch
-import numpy as np
 
 
 def trans_t(t): return torch.Tensor([
