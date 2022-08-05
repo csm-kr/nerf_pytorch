@@ -21,10 +21,10 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 | data          |  model             | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|----------|
-| drums(f)      | Hierarchical       | 4096           | 800 x 800  | 25.01   | 0.925  | 0.091  | -        |
-| hotdog(f)     | Hierarchical       | 4096           | 800 x 800  | 36.18   | 0.974  | 0.121  | -        |
-| lego(f)       | Hierarchical       | 4096           | 800 x 800  | 32.54   | 0.961  | 0.050  | -        |
-| materials(f)  | Hierarchical       | 4096           | 800 x 800  | 29.62   | 0.949  | 0.063  | -        |
+| drums         | Hierarchical       | 4096           | 800 x 800  | 25.0100 | 0.925  | 0.0910 | -        |
+| hotdog        | Hierarchical       | 4096           | 800 x 800  | 36.1800 | 0.974  | 0.1210 | -        |
+| lego          | Hierarchical       | 4096           | 800 x 800  | 32.5400 | 0.961  | 0.0500 | -        |
+| materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.949  | 0.0630 | -        |
 
 - quantitative results (this repo)
 
