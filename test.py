@@ -22,7 +22,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
 
     print('Start Testing for idx'.format(i))
     model.eval()
-    opts.is_test = True
+    # opts.is_test = True
 
     checkpoint = torch.load(os.path.join(opts.log_dir, opts.name, opts.name+'_{}.pth.tar'.format(i)))
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -104,7 +104,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
     f.write(line)
     f.close()
 
-    opts.is_test = False
+    # opts.is_test = False
     return result_best_test
 
 
