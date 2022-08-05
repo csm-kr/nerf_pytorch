@@ -17,7 +17,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ## Results
 
-* (f) : official results
+- quantitative results (official)
 
 | data          |  model             | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|----------|
@@ -26,7 +26,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 | lego(f)       | Hierarchical       | 4096           | 800 x 800  | 32.54   | 0.961  | 0.050  | -        |
 | materials(f)  | Hierarchical       | 4096           | 800 x 800  | 29.62   | 0.949  | 0.063  | -        |
 
-- quantitative results 
+- quantitative results (this repo)
 
 | data          | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|----------|
