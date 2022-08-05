@@ -19,10 +19,16 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 - quantitative results 
 
-| data       | exp   | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
-|------------|-------|--------------------|----------------|------------|---------|--------|--------|----------|
-| lego       | 0803  | Hierarchical       | 1024           | 400 x 400  | 31.0766 | 0.9597 | 0.0434 | 0.000817 |
-| materials  | 0804  | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 0.001700 |
+| data                 | Link  | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  |   Loss   | 
+|----------------------|-------|--------------------|----------------|------------|---------|--------|--------|----------|
+| lego (official)      | -     | Hierarchical       | 4096           | 800 x 800  | 32.54   | 0.961  | 0.050  | -        |
+| lego (ours)          | -     | Hierarchical       | 1024           | 400 x 400  | 31.0766 | 0.9597 | 0.0434 | 0.000817 |
+| materials (official) | -     | Hierarchical       | 4096           | 800 x 800  | 29.62   | 0.949  | 0.063  |  -       |
+| materials (ours)     | -     | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 0.001700 |
+| drums (official)     | -     | Hierarchical       | 4096           | 800 x 800  | 25.01   | 0.925  | 0.091  | -        |
+| drums (ours)         | -     | Hierarchical       | 1024           | 400 x 400  | 25.6536 | 0.9292 | 0.0769 | 0.002917 |
+| hotdog (official)    | -     | Hierarchical       | 4096           | 800 x 800  | 36.18   | 0.974  | 0.121  | -        |
+| hotdog (ours)        | -     | Hierarchical       | 1024           | 400 x 400  | - | - | - | - |
 
 - qualitative results
 
@@ -31,6 +37,9 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ![material_rgb](./figures/materials_000.png)
 ![material_gif](./figures/materials_rgb.gif)
+
+![drums_rgb](./figures/drums_000.png)
+![drums_gif](./figures/drums_rgb.gif)
 
 
 ### TODO LIST
