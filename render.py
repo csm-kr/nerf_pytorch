@@ -116,7 +116,7 @@ if __name__ == '__main__':
     import argparse
     from config import get_args_parser
 
-    parser = argparse.ArgumentParser('nerf lego testing', parents=[get_args_parser()])
+    parser = argparse.ArgumentParser('nerf testing', parents=[get_args_parser()])
     opts = parser.parse_args()
     opts.world_size = len(opts.gpu_ids)
     opts.num_workers = len(opts.gpu_ids) * 4
