@@ -12,7 +12,8 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - iterations : 300k
 - optimizer : Adam
 - init lr : 5e-4
-- scheduler : CosineAnnealingLR (upto 5e-5)
+- scheduler : CosineAnnealingLR (upto 5e-5) + warmup(10k)
+- network init : xavier for stability 
 
 ## Results
 
