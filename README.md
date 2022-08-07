@@ -35,7 +35,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 |---------------|--------------------|----------------|------------|---------|--------|--------|
 | drums         | Hierarchical       | 1024           | 400 x 400  | 25.6536 | 0.9292 | 0.0769 | 
 | hotdog        | Hierarchical       | 1024           | 400 x 400  | 37.3367 | 0.9809 | 0.0294 | 
-| lego          | Hierarchical       | 1024           | 400 x 400  | 31.0766 | 0.9597 | 0.0434 | 
+| lego          | Hierarchical       | 1024           | 400 x 400  | 31.7081 | 0.9636 | 0.0386 | 
 | materials     | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 
 
 - qualitative results

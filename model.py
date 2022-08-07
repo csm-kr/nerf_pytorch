@@ -54,6 +54,11 @@ class NeRFs(nn.Module):
         super().__init__()
         self.nerf_c = NeRF(D, W, input_ch, input_ch_d, skips)
         self.nerf_f = NeRF(D, W, input_ch, input_ch_d, skips)
+        self.apply(self._init_weights)
+
+    def _init_weights(self, m):
+        if isinstance(m, nn.Linear):
+            nn.init.xavier_uniform_(m.weight)
 
     def forward(self, x, is_fine=False):
         if is_fine:

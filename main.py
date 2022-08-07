@@ -9,6 +9,9 @@ from model import NeRFs
 from blender import load_blender
 from PE import get_positional_encoder
 
+# scheduler
+from scheduler import CosineAnnealingWarmupRestarts
+
 # train and test
 from train import train_each_iters
 from test import test_and_eval
@@ -42,7 +45,17 @@ def main_worker(rank, opts):
     optimizer = torch.optim.Adam(params=model.parameters(), lr=opts.lr, betas=(0.9, 0.999))
 
     # 7. scheduler
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opts.N_iters, eta_min=5e-5)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opts.N_iters, eta_min=5e-5)
+    num_steps = int(opts.N_iters)
+    warmup_steps = int(opts.warmup_iters)
+    scheduler = CosineAnnealingWarmupRestarts(
+        optimizer,
+        first_cycle_steps=num_steps,
+        cycle_mult=1.,
+        max_lr=opts.lr,
+        min_lr=5e-5,
+        warmup_steps=warmup_steps
+        )
 
     print('Begin')
     print('TRAIN views are', i_train)
