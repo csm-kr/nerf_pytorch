@@ -14,17 +14,20 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - init lr : 5e-4
 - scheduler : CosineAnnealingLR (upto 5e-5)
 
-
 ## Results
 
 - quantitative results (official)
 
 | data          |  model             | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|
-| drums         | Hierarchical       | 4096           | 800 x 800  | 25.0100 | 0.9250 | 0.0910 | 
-| hotdog        | Hierarchical       | 4096           | 800 x 800  | 36.1800 | 0.9740 | 0.1210 | 
-| lego          | Hierarchical       | 4096           | 800 x 800  | 32.5400 | 0.9610 | 0.0500 | 
-| materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.9490 | 0.0630 | 
+| Chair         | Hierarchical       | 4096           | 800 x 800  | 33.0000 | 0.9670 | 0.0460 | 
+| Drums         | Hierarchical       | 4096           | 800 x 800  | 25.0100 | 0.9250 | 0.0910 | 
+| Ficus         | Hierarchical       | 4096           | 800 x 800  | 30.1300 | 0.9640 | 0.0440 | 
+| Hotdog        | Hierarchical       | 4096           | 800 x 800  | 36.1800 | 0.9740 | 0.1210 | 
+| Lego          | Hierarchical       | 4096           | 800 x 800  | 32.5400 | 0.9610 | 0.0500 | 
+| Materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.9490 | 0.0630 | 
+| Mic           | Hierarchical       | 4096           | 800 x 800  | 32.9100 | 0.9800 | 0.0280 | 
+| Ship          | Hierarchical       | 4096           | 800 x 800  | 28.6500 | 0.8560 | 0.2060 | 
 
 - quantitative results (this repo)
 
@@ -59,6 +62,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - [x] Half version 
 - [x] Measure performance ssim, psnr and lpips
 - [x] Rendering
+- [ ] Other dataset [LIFF]
 - [ ] Quick start 
 
 
