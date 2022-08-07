@@ -21,19 +21,20 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 | data          |  model             | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|
-| Chair         | Hierarchical       | 4096           | 800 x 800  | 33.0000 | 0.9670 | 0.0460 | 
-| Drums         | Hierarchical       | 4096           | 800 x 800  | 25.0100 | 0.9250 | 0.0910 | 
-| Ficus         | Hierarchical       | 4096           | 800 x 800  | 30.1300 | 0.9640 | 0.0440 | 
-| Hotdog        | Hierarchical       | 4096           | 800 x 800  | 36.1800 | 0.9740 | 0.1210 | 
-| Lego          | Hierarchical       | 4096           | 800 x 800  | 32.5400 | 0.9610 | 0.0500 | 
-| Materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.9490 | 0.0630 | 
-| Mic           | Hierarchical       | 4096           | 800 x 800  | 32.9100 | 0.9800 | 0.0280 | 
-| Ship          | Hierarchical       | 4096           | 800 x 800  | 28.6500 | 0.8560 | 0.2060 | 
+| chair         | Hierarchical       | 4096           | 800 x 800  | 33.0000 | 0.9670 | 0.0460 | 
+| drums         | Hierarchical       | 4096           | 800 x 800  | 25.0100 | 0.9250 | 0.0910 | 
+| ficus         | Hierarchical       | 4096           | 800 x 800  | 30.1300 | 0.9640 | 0.0440 | 
+| hotdog        | Hierarchical       | 4096           | 800 x 800  | 36.1800 | 0.9740 | 0.1210 | 
+| lego          | Hierarchical       | 4096           | 800 x 800  | 32.5400 | 0.9610 | 0.0500 | 
+| materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.9490 | 0.0630 | 
+| mic           | Hierarchical       | 4096           | 800 x 800  | 32.9100 | 0.9800 | 0.0280 | 
+| ship          | Hierarchical       | 4096           | 800 x 800  | 28.6500 | 0.8560 | 0.2060 | 
 
 - quantitative results (this repo)
 
 | data          | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|
+| chair         | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
 | drums         | Hierarchical       | 1024           | 400 x 400  | 25.6536 | 0.9292 | 0.0769 | 
 | hotdog        | Hierarchical       | 1024           | 400 x 400  | 37.3367 | 0.9809 | 0.0294 | 
 | lego          | Hierarchical       | 1024           | 400 x 400  | 31.7081 | 0.9636 | 0.0386 | 
