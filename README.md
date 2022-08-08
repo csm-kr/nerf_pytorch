@@ -34,13 +34,17 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 | data          | model              | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  | 
 |---------------|--------------------|----------------|------------|---------|--------|--------|
-| chair         | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
+| chair         | Hierarchical       | 1024           | 400 x 400  | 34.8707 | 0.9790 | 0.0280 | 
 | drums         | Hierarchical       | 1024           | 400 x 400  | 25.6536 | 0.9292 | 0.0769 | 
+| ficus         | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
 | hotdog        | Hierarchical       | 1024           | 400 x 400  | 37.3367 | 0.9809 | 0.0294 | 
 | lego          | Hierarchical       | 1024           | 400 x 400  | 31.7081 | 0.9636 | 0.0386 | 
 | materials     | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 
 
 - qualitative results
+
+![chair_rgb](./figures/chair_000.png)
+![chair_gif](./figures/chair_rgb.gif)
 
 ![drums_rgb](./figures/drums_000.png)
 ![drums_gif](./figures/drums_rgb.gif)

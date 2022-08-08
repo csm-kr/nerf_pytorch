@@ -17,8 +17,8 @@ def get_args_parser():
 
     # dataset
     # FIXME
-    parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/chair')
-    parser.add_argument('--name', type=str, default='chair')
+    parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/ficus')
+    parser.add_argument('--name', type=str, default='ficus')
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
