@@ -6,7 +6,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ## Training
 
-- batch : 1024 (gtx 1080ti)
+- batch : 1024 (gtx 1080ti) due to 
 - loss : MSE
 - dataset : Realistic Synthetic 360
 - iterations : 300k
@@ -29,6 +29,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 | materials     | Hierarchical       | 4096           | 800 x 800  | 29.6200 | 0.9490 | 0.0630 | 
 | mic           | Hierarchical       | 4096           | 800 x 800  | 32.9100 | 0.9800 | 0.0280 | 
 | ship          | Hierarchical       | 4096           | 800 x 800  | 28.6500 | 0.8560 | 0.2060 | 
+| mean          | Hierarchical       | 4096           | 800 x 800  | 31.0100 | 0.9470 | 0.0810 | 
 
 - quantitative results (this repo)
 
@@ -36,10 +37,13 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 |---------------|--------------------|----------------|------------|---------|--------|--------|
 | chair         | Hierarchical       | 1024           | 400 x 400  | 34.8707 | 0.9790 | 0.0280 | 
 | drums         | Hierarchical       | 1024           | 400 x 400  | 25.6536 | 0.9292 | 0.0769 | 
-| ficus         | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
+| ficus         | Hierarchical       | 1024           | 400 x 400  | 29.3877 | 0.9643 | 0.0447 | 
 | hotdog        | Hierarchical       | 1024           | 400 x 400  | 37.3367 | 0.9809 | 0.0294 | 
 | lego          | Hierarchical       | 1024           | 400 x 400  | 31.7081 | 0.9636 | 0.0386 | 
 | materials     | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 
+| mic           | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
+| ship          | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
+| mean          | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
 
 - qualitative results
 
@@ -48,6 +52,9 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ![drums_rgb](./figures/drums_000.png)
 ![drums_gif](./figures/drums_rgb.gif)
+
+![drums_rgb](./figures/ficus_000.png)
+![drums_gif](./figures/ficus_rgb.gif)
 
 ![hotdog_rgb](./figures/hotdog_000.png)
 ![hotdog_gif](./figures/hotdog_rgb.gif)
