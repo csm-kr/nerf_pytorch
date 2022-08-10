@@ -42,7 +42,7 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 | lego          | Hierarchical       | 1024           | 400 x 400  | 31.7081 | 0.9636 | 0.0386 | 
 | materials     | Hierarchical       | 1024           | 400 x 400  | 29.8234 | 0.9570 | 0.0535 | 
 | mic           | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
-| ship          | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
+| ship          | Hierarchical       | 1024           | 400 x 400  | 29.6258 | 0.8762 | 0.1342 | 
 | mean          | Hierarchical       | 1024           | 400 x 400  | - | - | - | 
 
 - qualitative results
@@ -64,6 +64,9 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 
 ![material_rgb](./figures/materials_000.png)
 ![material_gif](./figures/materials_rgb.gif)
+
+![ship_rgb](./figures/ship_000.png)
+![ship_gif](./figures/ship_rgb.gif)
 
 
 ### TODO LIST

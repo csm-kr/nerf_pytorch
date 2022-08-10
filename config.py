@@ -17,8 +17,8 @@ def get_args_parser():
 
     # dataset
     # FIXME
-    parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/ship')
-    parser.add_argument('--name', type=str, default='ship')
+    parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic/mic')
+    parser.add_argument('--name', type=str, default='mic')
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
@@ -37,7 +37,6 @@ def get_args_parser():
     parser.add_argument("--white_bkgd", type=bool, default=True, help='set to render synthetic data on a white bkgd (always use for dvoxels)')
     parser.add_argument("--half_res", type=bool, default=True, help='load blender synthetic data at 400x400 instead of 800x800')
     parser.add_argument("--testskip", type=int, default=8, help='among 200 test dataset, skip number e.g. 8 -> 200//8 = 25')
-    # parser.add_argument("--precrop_iters", type=int, default=500)
 
     # testing
     parser.add_argument('--seed', type=int, default=0)
