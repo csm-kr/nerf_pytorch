@@ -50,8 +50,6 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 
 - For most classes, our repo performed slightly better that original papers.
 
-- we think it because the differences which are network init, resolution(batch size), and warm up training
-
 - qualitative results
 
 ![chair_rgb](./figures/chair_000.png)
