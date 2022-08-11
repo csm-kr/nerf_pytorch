@@ -2,7 +2,7 @@
 
 Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural Radiance Fields)
 
-We have referenced the following repos - ofiiclal [code](https://github.com/bmild/nerf) and pytorch nerf [code](https://github.com/yenchenlin/nerf-pytorch)
+We have referenced the following those repos - ofiiclal [code](https://github.com/bmild/nerf) and pytorch nerf [code](https://github.com/yenchenlin/nerf-pytorch)
 
 
 ## Environment
@@ -80,9 +80,9 @@ We have referenced the following repos - ofiiclal [code](https://github.com/bmil
 
 ### Quick start
 
-1 - download synthetic files at [here](https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1) to your root 
+1 - download synthetic files [here](https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1) to your root 
 
-2 - download pth files at upper link
+2 - download pth files at the upper link
 
 3 - make path 'logs' and put it in like this:
 
