@@ -122,7 +122,7 @@ def test_worker(rank, opts):
     criterion = torch.nn.MSELoss()
     result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
     test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
-    render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1)
+    # render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1)
 
 
 if __name__ == '__main__':
