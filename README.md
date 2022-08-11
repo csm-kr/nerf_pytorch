@@ -75,6 +75,39 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 ![ship_rgb](./figures/ship_000.png)
 ![ship_gif](./figures/ship_rgb.gif)
 
+### Quick start
+
+1 - download synthetic files at [here](https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1) to your root 
+
+2 - download pth files at upper link
+
+3 - make path 'logs' and put it in like this:
+
+```
+figures
+logs
+    |-- chair
+    ...
+    |-- lego
+        |-- lego_best.pth.tar
+    ...
+    |-- ship
+main.py
+blender.py
+...
+utils.py
+```
+
+4 - run test.py script with your dataset root and name and 'testing' args 
+
+```
+usage: test.py --root 'your root' --name 'the classs you wnat' --testing 
+e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
+```
+
+5 - than you can test image and rendering .mp4 and .gif
+
+![mic_rgb](./figures/lego_004.png)
 
 ### TODO LIST
 
@@ -85,8 +118,9 @@ Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural R
 - [x] Half version 
 - [x] Measure performance ssim, psnr and lpips
 - [x] Rendering
+- [x] Quick start 
 - [ ] Other dataset [LIFF]
-- [ ] Quick start 
 
+### Reference
 
-
+https://github.com/yenchenlin/nerf-pytorch

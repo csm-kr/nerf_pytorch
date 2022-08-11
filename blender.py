@@ -6,6 +6,7 @@ import numpy as np
 
 
 def load_blender(data_root: str, data_name: str, half_res: bool, testskip: int = 8, bkg_white: bool = True):
+    data_root = os.path.join(data_root, data_name)
     print(f"\n\nLoading Dataset {data_name}, from {data_root}")
     splits = ['train', 'val', 'test']
     metas = {}
