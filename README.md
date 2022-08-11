@@ -2,6 +2,9 @@
 
 Pytorch re-implementation of [NeRF](http://www.matthewtancik.com/nerf) (Neural Radiance Fields)
 
+We have referenced the following repos - ofiiclal [code](https://github.com/bmild/nerf) and pytorch nerf [code](https://github.com/yenchenlin/nerf-pytorch)
+
+
 ## Environment
 
 ## Training
@@ -122,5 +125,7 @@ e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
 - [ ] Other dataset [LIFF]
 
 ### Reference
+
+https://github.com/bmild/nerf
 
 https://github.com/yenchenlin/nerf-pytorch
