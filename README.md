@@ -129,7 +129,7 @@ https://github.com/bmild/nerf
 https://github.com/yenchenlin/nerf-pytorch
 
 
-##### citation
+### citation
 If you found this implementation and pretrained model helpful, please consider citation
 
 ```
