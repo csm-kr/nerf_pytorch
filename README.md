@@ -127,3 +127,15 @@ e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
 https://github.com/bmild/nerf
 
 https://github.com/yenchenlin/nerf-pytorch
+
+
+##### citation
+If you found this implementation and pretrained model helpful, please consider citation
+@misc{csm-kr_nerf,
+  author={Sungmin, Cho, Jinwook ,Paeng},
+  publisher = {GitHub},
+  title={nerf_pytorch},
+  url={https://github.com/csm-kr/nerf_pytorch/},
+  year={2022},
+}
+
