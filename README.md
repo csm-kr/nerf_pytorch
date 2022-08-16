@@ -131,6 +131,8 @@ https://github.com/yenchenlin/nerf-pytorch
 
 ##### citation
 If you found this implementation and pretrained model helpful, please consider citation
+
+```
 @misc{csm-kr_nerf,
   author={Sungmin, Cho, Jinwook ,Paeng},
   publisher = {GitHub},
@@ -138,4 +140,4 @@ If you found this implementation and pretrained model helpful, please consider c
   url={https://github.com/csm-kr/nerf_pytorch/},
   year={2022},
 }
-
+```
