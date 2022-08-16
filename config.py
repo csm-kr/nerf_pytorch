@@ -35,7 +35,9 @@ def get_args_parser():
     parser.add_argument("--perturb", type=float, default=1., help='set to 0. for no jitter, 1. for jitter')
     parser.add_argument("--use_viewdirs", type=bool, default=True, help='use full 5D input instead of 3D')
     parser.add_argument("--white_bkgd", type=bool, default=True, help='set to render synthetic data on a white bkgd (always use for dvoxels)')
-    parser.add_argument("--half_res", type=bool, default=True, help='load blender synthetic data at 400x400 instead of 800x800')
+    parser.set_defaults(half_res=True)
+    parser.add_argument('--full_res', dest='half_res', action='store_false')
+
     parser.add_argument("--testskip", type=int, default=8, help='among 200 test dataset, skip number e.g. 8 -> 200//8 = 25')
 
     # testing
