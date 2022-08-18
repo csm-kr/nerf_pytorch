@@ -20,6 +20,8 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 
 ## Results
 
+### Blender
+
 - quantitative results (official)
 
 | data          |  model             | Batch size     | resolution |  PSNR   |  SSIM  | LPIPS  | 
@@ -48,8 +50,7 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 | ship          | Hierarchical       | 1024           | 400 x 400  | 29.6258 | 0.8762 | 0.1342 | [link](https://livecauac-my.sharepoint.com/:u:/g/personal/csm8167_cau_ac_kr/EUiZG2RitnpCpUIo2S-eAmgB1Pho2c4Fq3QXLRUy_hGtsg) | 
 | mean          | Hierarchical       | 1024           | 400 x 400  | 31.5367 | 0.9538 | 0.0536 | -    | 
 
-
-### Blender
+- comparision with original papaers
 
 | model   |   chair   |   drums   |   ficus   |   hotdog  |    lego   | materials |    mic    |    ship   |    mean   |
 |---------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
