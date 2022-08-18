@@ -48,6 +48,14 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 | ship          | Hierarchical       | 1024           | 400 x 400  | 29.6258 | 0.8762 | 0.1342 | [link](https://livecauac-my.sharepoint.com/:u:/g/personal/csm8167_cau_ac_kr/EUiZG2RitnpCpUIo2S-eAmgB1Pho2c4Fq3QXLRUy_hGtsg) | 
 | mean          | Hierarchical       | 1024           | 400 x 400  | 31.5367 | 0.9538 | 0.0536 | -    | 
 
+
+### Blender
+
+| model   |   chair   |   drums   |   ficus   |   hotdog  |    lego   | materials |    mic    |    ship   |    mean   |
+|---------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| NeRF    | 33.0000  |   25.0100  |  30.1300  |  36.1800  |  32.5400  |  29.6200  |  32.9100  | 28.6500   |  31.0100  |
+| Ours    | 34.8707  |   25.6536  |  29.3877  |  37.3367  |  31.7081  |  29.8181  |  33.8926  | 29.6258.  |  31.5367  |
+
 - For most classes, our repo performed slightly better that original papers.
 
 - qualitative results
