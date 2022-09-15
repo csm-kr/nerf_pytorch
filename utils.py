@@ -64,10 +64,10 @@ def sample_rays_and_pixel(rays_o, rays_d, target_img, opts):
     selected_coords = coords[selected_idx].long()  # (N_rand, 2)
 
     # == Sample Rays ==
-    rays_o = rays_o[selected_coords[:, 0], selected_coords[:, 1]]
-    rays_d = rays_d[selected_coords[:, 0], selected_coords[:, 1]]
+    rays_o = rays_o[selected_coords[:, 1], selected_coords[:, 0]]
+    rays_d = rays_d[selected_coords[:, 1], selected_coords[:, 0]]
     # == Sample Pixel ==
-    target_img = target_img[selected_coords[:, 0], selected_coords[:, 1]]
+    target_img = target_img[selected_coords[:, 1], selected_coords[:, 0]]
 
     return rays_o, rays_d, target_img  # [1024, 3]
 
