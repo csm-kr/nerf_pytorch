@@ -7,6 +7,7 @@ from model import NeRFs
 
 # dataset
 from blender import load_blender
+from llff import load_llff_data
 from PE import get_positional_encoder
 
 # scheduler
@@ -30,7 +31,8 @@ def main_worker(rank, opts):
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # 3. dataset
-    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
+    # images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
+    images, poses, hwk, i_split = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=opts)
     i_train, i_val, i_test = i_split
 
     # 4. model and PE

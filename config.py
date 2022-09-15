@@ -16,15 +16,26 @@ def get_args_parser():
     parser.add_argument('--log_dir', type=str, default='./logs')
 
     # dataset
-    # FIXME
-    parser.add_argument('--name', type=str, help='class name')
-    parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic')
+    # FIXME select dataset
+
+    # blender
+    # parser.add_argument('--name', type=str, help='class name')
+    # parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic')
+    # parser.add_argument('--near', type=int, default=2)
+    # parser.add_argument('--far', type=int, default=6)
+
+    # llff
+    parser.add_argument('--llffhold', type=int, default=8,
+                        help='will take every 1/N images as LLFF test set, paper uses 8')
+    parser.add_argument('--name', type=str, default='fern', help='class name')
+    parser.add_argument('--root', type=str, default=r'./data/nerf_llff_data')
+    parser.add_argument('--near', type=int, default=0)
+    parser.add_argument('--far', type=int, default=1)
+
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
     parser.add_argument('--net_chunk', type=int, default=65536)  # 2 ^ 16
-    parser.add_argument('--near', type=int, default=2)
-    parser.add_argument('--far', type=int, default=6)
     parser.add_argument('--num_workers', type=int, default=0)
 
     # training
