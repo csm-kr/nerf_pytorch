@@ -119,6 +119,8 @@ e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
 
 ![mic_rgb](./figures/lego_004.png)
 
+### LLFF dataset
+
 ### TODO LIST
 
 - [x] README.md

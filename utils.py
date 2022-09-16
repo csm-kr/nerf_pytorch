@@ -72,8 +72,11 @@ def sample_rays_and_pixel(rays_o, rays_d, target_img, opts):
     return rays_o, rays_d, target_img  # [1024, 3]
 
 
-def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_posenc_d):
+def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_posenc_d, H, W, K):
     flat_ray_o, flat_ray_d = ray_o.view(-1, 3), ray_d.view(-1, 3)  # [640000, 3], [640000, 3]
+
+    # FIXME only llff dataset
+    flat_ray_o, flat_ray_d = ndc_rays(H, W, K[0][0], 1., flat_ray_o, flat_ray_d)
 
     num_whole_rays = flat_ray_o.size(0)
     rays = torch.cat((flat_ray_o, flat_ray_d), dim=-1)
@@ -142,8 +145,11 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     N_rays = rays.size(0)
     # assert N_rays == opts.chunk, 'N_rays must be same to chunk'
     rays_o, rays_d = rays[:, :3], rays[:, 3:]
+
     viewdirs = rays_d
     viewdirs = viewdirs / torch.norm(viewdirs, dim=-1, keepdim=True)  # make normal vector
+
+    # FIXME only llff
 
     near = opts.near * torch.ones([N_rays, 1])
     far = opts.far * torch.ones([N_rays, 1])
@@ -263,3 +269,23 @@ def sample_pdf(bins, weights, N_samples, det=False, opts=None):
     t = (u-cdf_g[..., 0])/denom
     samples = bins_g[..., 0] + t * (bins_g[..., 1]-bins_g[..., 0])
     return samples
+
+
+def ndc_rays(H, W, focal, near, rays_o, rays_d):
+    # Shift ray origins to near plane
+    t = -(near + rays_o[..., 2]) / rays_d[..., 2]
+    rays_o = rays_o + t[..., None] * rays_d
+
+    # Projection
+    o0 = -1. / (W / (2. * focal)) * rays_o[..., 0] / rays_o[..., 2]
+    o1 = -1. / (H / (2. * focal)) * rays_o[..., 1] / rays_o[..., 2]
+    o2 = 1. + 2. * near / rays_o[..., 2]
+
+    d0 = -1. / (W / (2. * focal)) * (rays_d[..., 0] / rays_d[..., 2] - rays_o[..., 0] / rays_o[..., 2])
+    d1 = -1. / (H / (2. * focal)) * (rays_d[..., 1] / rays_d[..., 2] - rays_o[..., 1] / rays_o[..., 2])
+    d2 = -2. * near / rays_o[..., 2]
+
+    rays_o = torch.stack([o0, o1, o2], -1)
+    rays_d = torch.stack([d0, d1, d2], -1)
+
+    return rays_o, rays_d

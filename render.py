@@ -83,7 +83,7 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
             print('RENDERING... idx: {}'.format(i))
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, render_pose[:3][:4])  # [1]
-            _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d)
+            _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, opts, fn_posenc, fn_posenc_d, img_h, img_w, img_k)
 
             # save test image
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])
