@@ -71,12 +71,37 @@ def sample_rays_and_pixel(rays_o, rays_d, target_img, opts):
 
     return rays_o, rays_d, target_img  # [1024, 3]
 
+# 점찍기
+def visualize_points_and_rays(flat_ray_o, flat_ray_d):
+    import matplotlib.pyplot as plt
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.scatter(flat_ray_o[:, 0],
+               flat_ray_o[:, 1],
+               flat_ray_o[:, 2])
+    ax.scatter(flat_ray_o[:, 0] + flat_ray_d[:, 0],
+               flat_ray_o[:, 1] + flat_ray_d[:, 1],
+               flat_ray_o[:, 2] + flat_ray_d[:, 2])
+    num_points = flat_ray_o.size(0)
+    for i in range(num_points):
+        ax.plot(
+            [flat_ray_o[i, 0], flat_ray_o[i, 0] + flat_ray_d[i, 0]],
+            [flat_ray_o[i, 1], flat_ray_o[i, 1] + flat_ray_d[i, 1]],
+            [flat_ray_o[i, 2], flat_ray_o[i, 2] + flat_ray_d[i, 2]]
+        )
+    plt.show()
 
-def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, opts, fn_posenc, fn_posenc_d, H, W, K):
+
+def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, fn_posenc, fn_posenc_d, H, W, K, opts):
     flat_ray_o, flat_ray_d = ray_o.view(-1, 3), ray_d.view(-1, 3)  # [640000, 3], [640000, 3]
+    if opts.vis_points_rays:
+        visualize_points_and_rays(flat_ray_o, flat_ray_d)
 
     # FIXME only llff dataset
-    flat_ray_o, flat_ray_d = ndc_rays(H, W, K[0][0], 1., flat_ray_o, flat_ray_d)
+    if opts.data_type == 'llff':
+        flat_ray_o, flat_ray_d = ndc_rays(H, W, K[0][0], 1., flat_ray_o, flat_ray_d)
+        if opts.vis_points_rays:
+            visualize_points_and_rays(flat_ray_o, flat_ray_d)
 
     num_whole_rays = flat_ray_o.size(0)
     rays = torch.cat((flat_ray_o, flat_ray_d), dim=-1)
