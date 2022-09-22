@@ -25,6 +25,7 @@ def get_args_parser():
     # parser.add_argument('--far', type=int, default=6)
 
     # llff
+    parser.add_argument('--data_type', type=str, default='llff', help='llff or blender')
     parser.add_argument('--llffhold', type=int, default=8,
                         help='will take every 1/N images as LLFF test set, paper uses 8')
     parser.add_argument('--name', type=str, default='fern', help='class name')
@@ -37,6 +38,9 @@ def get_args_parser():
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
     parser.add_argument('--net_chunk', type=int, default=65536)  # 2 ^ 16
     parser.add_argument('--num_workers', type=int, default=0)
+
+    parser.set_defaults(vis_points_rays=False)
+    parser.add_argument('--vis_points_rays_ture', dest='vis_points_rays', action='store_true')
 
     # training
     parser.add_argument('--N_iters', type=int, default=300001)

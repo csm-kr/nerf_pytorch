@@ -121,9 +121,10 @@ def normalize(x):
 
 
 def viewmatrix(z, up, pos):
-    vec2 = normalize(z)
+    # https://koreanfoodie.me/742
+    vec2 = normalize(z)    # w0
     vec1_avg = up
-    vec0 = normalize(np.cross(vec1_avg, vec2))
+    vec0 = normalize(np.cross(vec1_avg, vec2))   # w2
     vec1 = normalize(np.cross(vec2, vec0))
     m = np.stack([vec0, vec1, vec2, pos], 1)
     return m
@@ -251,7 +252,7 @@ def load_llff_data(data_root: str, data_name: str, factor=8, recenter=True, bd_f
     bds *= sc
 
     if recenter:
-        poses = recenter_poses(poses)
+        poses = recenter_poses(poses)  # recenter -> colmap 축에서 보통 축으로 바꾸어준다.
 
     if spherify:
         poses, render_poses, bds = spherify_poses(poses, bds)
