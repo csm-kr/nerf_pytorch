@@ -32,7 +32,7 @@ def main_worker(rank, opts):
 
     # 3. dataset
     # images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
-    images, poses, hwk, i_split = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=opts)
+    images, poses, hwk, i_split = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=True, path_zflat=False, opts=opts)
     i_train, i_val, i_test = i_split
 
     # 4. model and PE
