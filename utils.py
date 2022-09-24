@@ -314,3 +314,25 @@ def ndc_rays(H, W, focal, near, rays_o, rays_d):
     rays_d = torch.stack([d0, d1, d2], -1)
 
     return rays_o, rays_d
+
+
+class GetterRayBatchIdx(object):
+    def __init__(self, rays_rgb):
+        self.rays_rgb = rays_rgb
+        self.epoch = 0
+        self.i_batch = 0
+
+    def shuffle_ray_idx(self):
+        print("Shuffle data after an epoch!")
+        rand_idx = torch.randperm(self.rays_rgb.shape[0])
+        self.rays_rgb = self.rays_rgb[rand_idx]
+        self.i_batch = 0
+        self.epoch += 1
+
+    def __call__(self, batch_size):
+        self.i_batch += batch_size
+        if self.i_batch >= self.rays_rgb.shape[0]:
+            self.shuffle_ray_idx()
+        return self.i_batch, self.rays_rgb, self.epoch
+
+
