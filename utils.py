@@ -322,17 +322,17 @@ class GetterRayBatchIdx(object):
         self.epoch = 0
         self.i_batch = 0
 
-    def shuffle_ray_idx(self):
+    def shuffle_ray_idx(self, batch_size):
         print("Shuffle data after an epoch!")
         rand_idx = torch.randperm(self.rays_rgb.shape[0])
         self.rays_rgb = self.rays_rgb[rand_idx]
-        self.i_batch = 0
+        self.i_batch = batch_size
         self.epoch += 1
 
     def __call__(self, batch_size):
         self.i_batch += batch_size
         if self.i_batch >= self.rays_rgb.shape[0]:
-            self.shuffle_ray_idx()
+            self.shuffle_ray_idx(batch_size)
         return self.i_batch, self.rays_rgb, self.epoch
 
 

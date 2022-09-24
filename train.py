@@ -14,7 +14,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     # ray_o, ray_d is on the cpu
     # target_img is on the gpu
 
-    if raybatchidx is not None and opts.global_batch:
+    if getter_ray_batch_idx is not None and opts.global_batch:
         # batch가 size를 넘어가면 shuffle
         i_batch, rays_rgb, epoch = getter_ray_batch_idx(opts.batch_size)
         # Random over all images
