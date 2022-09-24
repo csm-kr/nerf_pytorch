@@ -43,6 +43,8 @@ def get_args_parser():
     parser.add_argument('--vis_points_rays_ture', dest='vis_points_rays', action='store_true')
 
     # training
+    parser.set_defaults(global_batch=True)
+    parser.add_argument('--global_batch_false', dest='global_batch', action='store_false')
     parser.add_argument('--N_iters', type=int, default=300001)
     parser.add_argument('--warmup_iters', type=int, default=10000)
     parser.add_argument("--N_samples", type=int, default=64, help='number of coarse samples per ray')

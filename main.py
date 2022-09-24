@@ -17,6 +17,11 @@ from scheduler import CosineAnnealingWarmupRestarts
 from train import train_each_iters
 from test import test_and_eval
 
+# numpy get_rays
+import numpy as np
+from rays import get_rays_np
+from utils import GetterRayBatchIdx
+
 
 def main_worker(rank, opts):
     # 1. parser
@@ -32,7 +37,7 @@ def main_worker(rank, opts):
 
     # 3. dataset
     # images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, opts.testskip, opts.white_bkgd)
-    images, poses, hwk, i_split = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=True, path_zflat=False, opts=opts)
+    images, poses, hwk, i_split = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=opts)
     i_train, i_val, i_test = i_split
 
     # 4. model and PE
@@ -70,10 +75,27 @@ def main_worker(rank, opts):
     result_best = {'i': 0, 'loss': 0, 'psnr': 0}
     result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
 
+    rays_rgb = None
+
+    if opts.global_batch:
+        img_h, img_w, k = hwk
+        print('>> [Global Batching] Random Ray for all images')                          # num_img, [ray_o, ray_d], hwf
+        rays = np.stack([get_rays_np(img_h, img_w, k, p) for p in poses[:, :3, :4]], 0)  # [20, 2, 378, 504, 3]
+        rays_rgb = np.concatenate([rays, images[:, None]], 1)
+        rays_rgb = np.transpose(rays_rgb, [0, 2, 3, 1, 4])
+        rays_rgb = np.stack([rays_rgb[i] for i in i_train], 0)
+        rays_rgb = np.reshape(rays_rgb, [-1, 3, 3])
+        rays_rgb = rays_rgb.astype(np.float32)
+        np.random.shuffle(rays_rgb)
+        rays_rgb = torch.Tensor(rays_rgb)
+
+    # rays_rgb batch getter for global batch
+    getter_ray_batch_idx = GetterRayBatchIdx(rays_rgb)
+
     for i in range(start, opts.N_iters):
         # train
         result_best = train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d,
-                                       vis, optimizer, criterion, result_best, opts)
+                                       vis, optimizer, criterion, result_best, opts, getter_ray_batch_idx)
 
         # test and render
         if i % opts.save_step == 0 and i > 0:
