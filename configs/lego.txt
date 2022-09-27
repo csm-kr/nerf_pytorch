@@ -1,0 +1,8 @@
+name = lego_09_27
+
+data_type = llff
+data_root = ./data/nerf_synthetic
+data_name = lego
+
+near = 2.
+far = 6.

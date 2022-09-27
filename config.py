@@ -1,10 +1,13 @@
-import argparse
+import configargparse
 
 
 def get_args_parser():
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = configargparse.ArgumentParser(add_help=False)
+    # config
+    parser.add_argument('--config', is_config_file=True, help='config file path')
+    parser.add_argument('--name', type=str)
 
-    # visualization
+    # visdom
     parser.add_argument('--visdom_port', type=int, default=2023)
 
     # etc
@@ -16,23 +19,15 @@ def get_args_parser():
     parser.add_argument('--log_dir', type=str, default='./logs')
 
     # dataset
-    # FIXME select dataset
-
-    # blender
-    # parser.add_argument('--name', type=str, help='class name')
-    # parser.add_argument('--root', type=str, default=r'./data/nerf_synthetic')
-    # parser.add_argument('--near', type=int, default=2)
-    # parser.add_argument('--far', type=int, default=6)
-
-    # llff
-    parser.add_argument('--data_type', type=str, default='llff', help='llff or blender')
+    parser.add_argument('--data_type', type=str, help='llff or blender')
+    parser.add_argument('--data_root', type=str)
+    parser.add_argument('--data_name', type=str)
     parser.add_argument('--llffhold', type=int, default=8,
                         help='will take every 1/N images as LLFF test set, paper uses 8')
-    parser.add_argument('--name', type=str, default='fern', help='class name')
-    parser.add_argument('--root', type=str, default=r'./data/nerf_llff_data')
-    parser.add_argument('--near', type=int, default=0)
-    parser.add_argument('--far', type=int, default=1)
+    parser.add_argument('--near', type=float)
+    parser.add_argument('--far', type=float)
 
+    # training
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
     parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
@@ -42,15 +37,16 @@ def get_args_parser():
     parser.set_defaults(vis_points_rays=False)
     parser.add_argument('--vis_points_rays_ture', dest='vis_points_rays', action='store_true')
 
-    # training
+    # global batch
     parser.set_defaults(global_batch=True)
     parser.add_argument('--global_batch_false', dest='global_batch', action='store_false')
-    parser.add_argument('--N_iters', type=int, default=300001)
+    parser.add_argument('--N_iters', type=int)
     parser.add_argument('--warmup_iters', type=int, default=10000)
     parser.add_argument("--N_samples", type=int, default=64, help='number of coarse samples per ray')
     parser.add_argument("--N_importance", type=int, default=128, help='number of additional fine samples per ray')
     parser.add_argument("--perturb", type=float, default=1., help='set to 0. for no jitter, 1. for jitter')
-    parser.add_argument("--use_viewdirs", type=bool, default=True, help='use full 5D input instead of 3D')
+
+    parser.set_defaults(use_viewdirs=True)
     parser.add_argument("--white_bkgd", type=bool, default=True, help='set to render synthetic data on a white bkgd (always use for dvoxels)')
     parser.set_defaults(half_res=True)
     parser.add_argument('--full_res', dest='half_res', action='store_false')
@@ -76,9 +72,8 @@ def get_args_parser():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('nerf lego training', parents=[get_args_parser()])
+    parser = configargparse.ArgumentParser('nerf lego training', parents=[get_args_parser()])
     opts = parser.parse_args()
-
     opts.world_size = len(opts.gpu_ids)
     opts.num_workers = len(opts.gpu_ids) * 4
     print(opts)
