@@ -5,9 +5,9 @@ import imageio
 import numpy as np
 
 
-def load_blender(data_root: str, data_name: str, half_res: bool, testskip: int = 8, bkg_white: bool = True):
-    data_root = os.path.join(data_root, data_name)
-    print(f"\n\nLoading Dataset {data_name}, from {data_root}")
+def load_blender(half_res: bool, testskip: int = 8, bkg_white: bool = True, opts=None):
+    data_root = os.path.join(opts.data_root, opts.data_name)
+    print(f"\n\nLoading Dataset {opts.data_name}, from {data_root}")
     splits = ['train', 'val', 'test']
     metas = {}
     # Load Annotation (JSON)
@@ -73,6 +73,6 @@ def load_blender(data_root: str, data_name: str, half_res: bool, testskip: int =
     else:
         imgs = imgs[..., :3]
 
-    return imgs, poses, [H, W, K], i_split
+    return imgs, poses, [H, W, K], i_split, None
 
 
