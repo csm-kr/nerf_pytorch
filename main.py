@@ -39,7 +39,7 @@ def main_worker(rank, opts):
     if opts.data_type == 'blender':
         images, poses, hwk, i_split, render_poses = load_blender(opts.half_res, opts.testskip, opts.white_bkgd, opts)
     elif opts.data_type == 'llff':
-        images, poses, hwk, i_split, render_poses = load_llff_data(opts)
+        images, poses, hwk, i_split, render_poses = load_llff_data(opts=opts)
 
     i_train, i_val, i_test = i_split
 
