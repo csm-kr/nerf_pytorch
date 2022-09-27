@@ -10,6 +10,7 @@ import argparse
 from config import get_args_parser
 # dataset
 from blender import load_blender
+from llff import load_llff_data
 # model
 from model import NeRFs
 from PE import get_positional_encoder
@@ -110,7 +111,11 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
 
 def test_worker(rank, opts):
 
-    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
+    if opts.data_type == 'blender':
+        images, poses, hwk, i_split, render_poses = load_blender(opts.half_res, opts.testskip, opts.white_bkgd, opts)
+    elif opts.data_type == 'llff':
+        images, poses, hwk, i_split, render_poses = load_llff_data(opts)
+
     i_train, i_val, i_test = i_split
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     vis = None
@@ -121,8 +126,13 @@ def test_worker(rank, opts):
     model = NeRFs(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
     criterion = torch.nn.MSELoss()
     result_best_test = {'i': 0, 'loss': 0, 'psnr': 0, 'ssim': 0, 'lpips': 0}
-    test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
-    render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1)
+
+    # # test for 20 dataset
+    # i_train_test = np.arange(20)
+    # test_and_eval(50000, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
+
+    test_and_eval(50000, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
+    render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1, render_poses=render_poses)
 
 
 if __name__ == '__main__':

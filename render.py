@@ -105,8 +105,12 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
 
 def render_worker(rank, opts):
-    # images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
-    images, poses, hwk, i_split, render_poses = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=opts)
+
+    if opts.data_type == 'blender':
+        images, poses, hwk, i_split, render_poses = load_blender(opts.half_res, opts.testskip, opts.white_bkgd, opts)
+    elif opts.data_type == 'llff':
+        images, poses, hwk, i_split, render_poses = load_llff_data(opts)
+
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     fn_posenc, input_ch = get_positional_encoder(L=10)
     fn_posenc_d, input_ch_d = get_positional_encoder(L=4)
