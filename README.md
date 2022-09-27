@@ -61,29 +61,39 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 
 - qualitative results
 
-![chair_rgb](./figures/chair_000.png)
-![chair_gif](./figures/chair_rgb.gif)
+![chair_rgb](figures/blender/chair_000.png)
+![chair_gif](figures/blender/chair_rgb.gif)
 
-![drums_rgb](./figures/drums_000.png)
-![drums_gif](./figures/drums_rgb.gif)
+![drums_rgb](figures/blender/drums_000.png)
+![drums_gif](figures/blender/drums_rgb.gif)
 
-![drums_rgb](./figures/ficus_000.png)
-![drums_gif](./figures/ficus_rgb.gif)
+![drums_rgb](figures/blender/ficus_000.png)
+![drums_gif](figures/blender/ficus_rgb.gif)
 
-![hotdog_rgb](./figures/hotdog_000.png)
-![hotdog_gif](./figures/hotdog_rgb.gif)
+![hotdog_rgb](figures/blender/hotdog_000.png)
+![hotdog_gif](figures/blender/hotdog_rgb.gif)
 
-![lego_rgb](./figures/000.png)
-![lego_gif](./figures/lego.gif)
+![lego_rgb](figures/blender/000.png)
+![lego_gif](figures/blender/lego.gif)
 
-![material_rgb](./figures/materials_000.png)
-![material_gif](./figures/materials_rgb.gif)
+![material_rgb](figures/blender/materials_000.png)
+![material_gif](figures/blender/materials_rgb.gif)
 
-![mic_rgb](./figures/mic_000.png)
-![mic_gif](./figures/mic_rgb.gif)
+![mic_rgb](figures/blender/mic_000.png)
+![mic_gif](figures/blender/mic_rgb.gif)
 
-![ship_rgb](./figures/ship_000.png)
-![ship_gif](./figures/ship_rgb.gif)
+![ship_rgb](figures/blender/ship_000.png)
+![ship_gif](figures/blender/ship_rgb.gif)
+
+### LLFF
+
+| model   |   room    |   fern    |   leaves  |  fortress |  orchids  |  flower   |   t-rex   |   horns   |    mean   |
+|---------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+| NeRF    | 32.70     | 25.17     |  20.92    |  31.16    |   20.36   |  27.40    |   26.80   | 27.45     |  26.495   |  
+| Ours    |  -        | -         |  -        |   -       |  -        |  28.4948  |        -  | -         |  -        |
+
+![flower_rgb](figures/llff/flower_09_27_000.png)
+![flower_gif](figures/llff/flower_09_27_rgb.gif)
 
 ### Quick start
 
@@ -117,7 +127,7 @@ e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
 
 5 - than you can test image and rendering .mp4 and .gif
 
-![mic_rgb](./figures/lego_004.png)
+![mic_rgb](figures/blender/lego_004.png)
 
 ### LLFF dataset
 
@@ -131,7 +141,8 @@ e.g.) python test.py --root ./data/nerf_synthetic --name lego --testing
 - [x] Measure performance ssim, psnr and lpips
 - [x] Rendering
 - [x] Quick start 
-- [ ] Other dataset [LIFF]
+- [x] Other dataset [LIFF]
+- [ ] Our custom dataset
 
 ### Reference
 

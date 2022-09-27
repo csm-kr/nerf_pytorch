@@ -1,0 +1,10 @@
+name = fortress_09_28
+
+data_type = llff
+data_root = ./data/nerf_llff_data
+data_name = fortress
+
+near = 0.
+far = 1.
+
+N_iters = 200001
