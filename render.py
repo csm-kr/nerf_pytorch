@@ -8,6 +8,7 @@ from tqdm import tqdm, trange
 
 # data
 from blender import load_blender
+from llff import load_llff_data
 
 # model
 from PE import get_positional_encoder
@@ -56,14 +57,16 @@ def get_render_pose(n_angle=1, single_angle=-1, phi=-30.0):
     return render_poses
 
 
-def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1):
+def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1, render_poses=None):
     '''
     default ) n_angle : 40 / single_angle = -1
     if single_angle is not -1 , it would result single rendering image.
     '''
     print('Start Rendering for idx'.format(i))
 
-    render_poses = get_render_pose(n_angle=n_angle, single_angle=single_angle, phi=opts.phi)
+    if render_poses is None and opts.data_type == 'blender':
+        render_poses = get_render_pose(n_angle=n_angle, single_angle=single_angle, phi=opts.phi)
+
     checkpoint = torch.load(os.path.join(opts.log_dir, opts.name, opts.name+'_{}.pth.tar'.format(i)))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
@@ -82,7 +85,7 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
         for i, render_pose in enumerate(tqdm(render_poses)):
 
             print('RENDERING... idx: {}'.format(i))
-            rays_o, rays_d = make_o_d(img_w, img_h, img_k, render_pose[:3][:4])  # [1]
+            rays_o, rays_d = make_o_d(img_w, img_h, img_k, render_pose[:3, :4])  # [1]
             _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)
 
             # save test image
@@ -102,12 +105,13 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
 
 def render_worker(rank, opts):
-    images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
+    # images, poses, hwk, i_split = load_blender(opts.root, opts.name, opts.half_res, testskip=opts.testskip, bkg_white=opts.white_bkgd)
+    images, poses, hwk, i_split, render_poses = load_llff_data(opts.root, opts.name, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=opts)
     device = torch.device('cuda:{}'.format(opts.gpu_ids[opts.rank]))
     fn_posenc, input_ch = get_positional_encoder(L=10)
     fn_posenc_d, input_ch_d = get_positional_encoder(L=4)
     model = NeRFs(D=8, W=256, input_ch=63, input_ch_d=27, skips=[4]).to(device)
-    render('best', hwk, model, fn_posenc, fn_posenc_d, opts)
+    render('best', hwk, model, fn_posenc, fn_posenc_d, opts, render_poses=render_poses)
 
 
 if __name__ == '__main__':
