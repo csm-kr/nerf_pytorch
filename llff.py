@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 import os, imageio
 
@@ -233,8 +234,8 @@ def spherify_poses(poses, bds):
     return poses_reset, 0, bds
 
 
-def load_llff_data(data_root: str, data_name: str, factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=None):
-    basedir = os.path.join(data_root, data_name)
+def load_llff_data(factor=8, recenter=True, bd_factor=.75, spherify=False, path_zflat=False, opts=None):
+    basedir = os.path.join(opts.data_root, opts.data_name)
 
     poses, bds, imgs = _load_data(basedir, factor=factor)  # factor=8 downsamples original imgs by 8x
     print('Loaded', basedir, bds.min(), bds.max())
@@ -328,6 +329,9 @@ def load_llff_data(data_root: str, data_name: str, factor=8, recenter=True, bd_f
     i_train = np.array([i for i in np.arange(int(images.shape[0])) if
                         (i not in i_test and i not in i_val)])
 
-    return images, poses, [H, W, K], [i_train, i_val, i_test]
+    # new
+    render_poses = torch.Tensor(render_poses)
+
+    return images, poses, [H, W, K], [i_train, i_val, i_test], render_poses
 
     # return images, poses, bds, render_poses, i_test
