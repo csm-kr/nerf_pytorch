@@ -89,7 +89,7 @@ def main_worker(rank, opts):
         rays_rgb = np.reshape(rays_rgb, [-1, 3, 3])
         rays_rgb = rays_rgb.astype(np.float32)
         np.random.shuffle(rays_rgb)
-        rays_rgb = torch.Tensor(rays_rgb)
+        rays_rgb = torch.Tensor(rays_rgb).to(device)
 
     # rays_rgb batch getter for global batch
     getter_ray_batch_idx = GetterRayBatchIdx(rays_rgb)

@@ -40,7 +40,8 @@ def getLPIPS(pred, gt):
 def make_o_d(img_w, img_h, img_k, pose):
 
     # make catesian (x. y)
-    i, j = torch.meshgrid(torch.linspace(0, img_w - 1, img_w), torch.linspace(0, img_h - 1, img_h))
+    i, j = torch.meshgrid(torch.linspace(0, img_w - 1, img_w, device=pose.get_device()),
+                          torch.linspace(0, img_h - 1, img_h, device=pose.get_device()))
     i = i.t()
     j = j.t()
 
@@ -107,31 +108,33 @@ def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, fn_posenc, fn_posenc_
     rays = torch.cat((flat_ray_o, flat_ray_d), dim=-1)
 
     ret_coarse = []
+    ret_coarse_disp = []
     ret_fine = []
+    ret_fine_disp = []
 
     for i in range(0, num_whole_rays, opts.chunk):
         rgb_dict = render_rays(rays[i:i+opts.chunk], model, fn_posenc, fn_posenc_d, opts)
 
         if opts.N_importance > 0:                    # use fine rays
             ret_coarse.append(rgb_dict['coarse'])
+            ret_coarse_disp.append(rgb_dict['disp_coarse'])
             ret_fine.append(rgb_dict['fine'])
+            ret_fine_disp.append(rgb_dict['disp_fine'])
         else:                                        # use only coarse rays
             ret_coarse.append(rgb_dict['coarse'])
+            ret_coarse_disp.append(rgb_dict['disp_coarse'])
 
     if opts.N_importance > 0:
-        return torch.cat(ret_coarse, dim=0), torch.cat(ret_fine, dim=0)
+        # RGB, DIST / RGB, DIST
+        return torch.cat(ret_coarse, dim=0), torch.cat(ret_coarse_disp, dim=0), \
+               torch.cat(ret_fine, dim=0), torch.cat(ret_fine_disp, dim=0)
     else:
-        return torch.cat(ret_coarse, dim=0), None
+        return torch.cat(ret_coarse, dim=0), torch.cat(ret_coarse_disp, dim=0), None, None
 
 
 def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
     # 1. pre process : make (pts and dirs) (embedded)
     embedded, z_vals, rays_d = pre_process(rays, fn_posenc, fn_posenc_d, opts)
-
-    # ** assign to cuda **
-    embedded = embedded.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-    z_vals = z_vals.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-    rays_d = rays_d.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
     # 2. run model by net_chunk
     chunk = opts.net_chunk
@@ -143,14 +146,10 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
     rgb_map, disp_map, acc_map, weights, depth_map = post_process(outputs, z_vals, rays_d)
 
     if opts.N_importance > 0:
+
         # 4. pre precess
         rays = rays.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
         embedded_fine, z_vals_fine, rays_d = pre_process_for_hierarchical(rays, z_vals, weights, fn_posenc, fn_posenc_d, opts)
-
-        # ** assign to cuda **
-        # embedded_fine = embedded_fine.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-        # z_vals_fine = z_vals_fine.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-        # rays_d = rays_d.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
 
         # 5. run model by net_chunk
         outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk], is_fine=True) for i in range(0, embedded_fine.shape[0], chunk)], 0)
@@ -158,11 +157,10 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
         outputs_fine = outputs_fine_flat.reshape(size_fine)
 
         # 6. post process : render each pixel color by formula (3) in nerf paper
-        rgb_map_fine, disp_map_fine, acc_map_fine, weights_fine, depth_map_fine = post_process(outputs_fine,
-                                                                                               z_vals_fine, rays_d)
+        rgb_map_fine, disp_map_fine, acc_map_fine, weights_fine, depth_map_fine = post_process(outputs_fine, z_vals_fine, rays_d)
 
-        return {'coarse': rgb_map, 'fine': rgb_map_fine}
-    return {'coarse': rgb_map}
+        return {'coarse': rgb_map, 'disp_coarse': disp_map, 'fine': rgb_map_fine, 'disp_fine': disp_map_fine}
+    return {'coarse': rgb_map, 'disp_coarse': disp_map}
 
 
 def pre_process(rays, fn_posenc, fn_posenc_d, opts):
@@ -176,10 +174,10 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
 
     # FIXME only llff
 
-    near = opts.near * torch.ones([N_rays, 1])
-    far = opts.far * torch.ones([N_rays, 1])
+    near = opts.near * torch.ones([N_rays, 1], device=torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
+    far = opts.far * torch.ones([N_rays, 1], device=torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
 
-    t_vals = torch.linspace(0., 1., steps=opts.N_samples)
+    t_vals = torch.linspace(0., 1., steps=opts.N_samples, device=torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
     z_vals = near * (1.-t_vals) + far * (t_vals)
     z_vals = z_vals.expand([N_rays, opts.N_samples])
     mids = .5 * (z_vals[..., 1:] + z_vals[..., :-1])
@@ -187,7 +185,7 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     lower = torch.cat([z_vals[..., :1], mids], -1)
     if opts.is_test:
         torch.manual_seed(opts.seed)
-    t_rand = torch.rand([N_rays, opts.N_samples])
+    t_rand = torch.rand([N_rays, opts.N_samples], device=torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
     z_vals = lower + (upper-lower) * t_rand
 
     # rays_o, rays_d : [B, 1, 3], z_vals : [B, 64, 1]
@@ -248,6 +246,7 @@ def post_process(outputs, z_vals, rays_d):
     depth_map = torch.sum(weights * z_vals, -1)
     disp_map = 1./torch.max(1e-10 * torch.ones_like(depth_map), depth_map / torch.sum(weights, -1))
     acc_map = torch.sum(weights, -1)
+
     # alpha to real color
     rgb_map = rgb_map + (1.-acc_map.unsqueeze(-1))
     return rgb_map, disp_map, acc_map, weights, depth_map

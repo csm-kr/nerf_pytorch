@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 # parser
-import argparse
+import configargparse
 from config import get_args_parser
 # dataset
 from blender import load_blender
@@ -22,12 +22,14 @@ from render import render
 def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts):
 
     print('Start Testing for idx'.format(i))
-    model.eval()
-    # opts.is_test = True
+    # opts.is_test = True - 같은 testset 에서 같은 성능이 나오도록
 
+    # load check points
     checkpoint = torch.load(os.path.join(opts.log_dir, opts.name, opts.name+'_{}.pth.tar'.format(i)))
     model.load_state_dict(checkpoint['model_state_dict'])
+    model.eval()
 
+    # make save dir
     save_test_dir = os.path.join(opts.log_dir, opts.name, opts.name+'_{}'.format(i), 'test_result')
     os.makedirs(save_test_dir, exist_ok=True)
 
@@ -38,24 +40,31 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
     ssims = []
     lpipses = []
 
-    test_imgs =torch.from_numpy(images[i_test])
-    test_poses = torch.from_numpy(poses[i_test])
+    test_imgs = torch.from_numpy(images[i_test]).to(torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
+    test_poses = torch.from_numpy(poses[i_test]).to(torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
 
     with torch.no_grad():
 
         for i, test_pose in enumerate(tqdm(test_poses)):
 
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, test_pose[:3][:4])  # [1]
-            _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # ** hierachicle sampling **
+            _, _, pred_rgb, pred_disp = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # ** hierachicle sampling **
             # https://github.com/yenchenlin/nerf-pytorch/blob/63a5a630c9abd62b0f21c08703d0ac2ea7d4b9dd/run_nerf.py#L403
 
             # SAVE test image
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])
             rgb_np = rgb.cpu().numpy()
 
+            disp = torch.reshape(pred_disp, [img_h, img_w, 1])
+            disp_np = disp.cpu().numpy()
+            disp_np = disp_np / disp_np.max()
+
             rgb8 = to8b(rgb_np)
-            savefilename = os.path.join(save_test_dir, '{}_{:03d}.png'.format(opts.name, i))
-            imageio.imwrite(savefilename, rgb8)
+            dist8 = to8b(disp_np)
+            savefilename_rgb = os.path.join(save_test_dir, '{}_{:03d}.png'.format(opts.name, i))
+            imageio.imwrite(savefilename_rgb, rgb8)
+            savefilename_dist = os.path.join(save_test_dir, '{}_{:03d}_dist.png'.format(opts.name, i))
+            imageio.imwrite(savefilename_dist, dist8)
 
             # GET loss & psnr
             target_img_flat = torch.reshape(test_imgs[i], [-1, 3]).to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
@@ -131,13 +140,13 @@ def test_worker(rank, opts):
     # i_train_test = np.arange(20)
     # test_and_eval(50000, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
 
-    test_and_eval(50000, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
+    test_and_eval('best', i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, criterion, result_best_test, opts)
     render('best', hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1, render_poses=render_poses)
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser('nerf lego testing', parents=[get_args_parser()])
+    parser = configargparse.ArgumentParser('nerf lego testing', parents=[get_args_parser()])
     opts = parser.parse_args()
 
     opts.world_size = len(opts.gpu_ids)

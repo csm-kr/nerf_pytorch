@@ -27,8 +27,8 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
     else:
         # sample train index
         i_img = np.random.choice(i_train)
-        target_img = torch.from_numpy(images[i_img]).type(torch.float32)
-        target_pose = torch.from_numpy(poses[i_img, :3, :4])
+        target_img = torch.from_numpy(images[i_img]).type(torch.float32).to(f'cuda:{opts.gpu_ids[opts.rank]}')
+        target_pose = torch.from_numpy(poses[i_img, :3, :4]).to(f'cuda:{opts.gpu_ids[opts.rank]}')
 
         img_h, img_w, img_k = hwk
 

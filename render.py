@@ -58,26 +58,27 @@ def get_render_pose(n_angle=1, single_angle=-1, phi=-30.0):
 
 
 def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle=-1, render_poses=None):
-    '''
-    default ) n_angle : 40 / single_angle = -1
-    if single_angle is not -1 , it would result single rendering image.
-    '''
+
     print('Start Rendering for idx'.format(i))
 
+    # make render poses for blender
     if render_poses is None and opts.data_type == 'blender':
         render_poses = get_render_pose(n_angle=n_angle, single_angle=single_angle, phi=opts.phi)
 
+    # load check points
     checkpoint = torch.load(os.path.join(opts.log_dir, opts.name, opts.name+'_{}.pth.tar'.format(i)))
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
+    # make save dir
     save_render_dir = os.path.join(opts.log_dir, opts.name, opts.name+'_{}'.format(i), 'render_result')
     os.makedirs(save_render_dir, exist_ok=True)
 
+    render_poses = torch.Tensor(render_poses).to(torch.device(f'cuda:{opts.gpu_ids[opts.rank]}'))
     img_h, img_w, img_k = hwk
 
     rgbs = []
-    # disps = []
+    disps = []
     # depths = []
     # accs = []
 
@@ -86,22 +87,31 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
             print('RENDERING... idx: {}'.format(i))
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, render_pose[:3, :4])  # [1]
-            _, pred_rgb = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)
+            _, _, pred_rgb, pred_disp = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)
 
-            # save test image
+            # save test image rgb
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])
             rgb_np = rgb.cpu().numpy()
             rgbs.append(rgb_np)
 
+            # save test image disp
+            disp = torch.reshape(pred_disp, [img_h, img_w, 1])
+            disp_np = disp.cpu().numpy()
+            disps.append(disp_np)
+
             if not single_angle == -1:
-                imageio.imwrite(os.path.join(save_render_dir, '{}_{}_rgb.png'.format(opts.single_angle,
-                                                                                     str(opts.phi))), to8b(rgb_np))
+                imageio.imwrite(os.path.join(save_render_dir, '{}_{}_rgb.png'.format(opts.single_angle, str(opts.phi))), to8b(rgb_np))
+                imageio.imwrite(os.path.join(save_render_dir, '{}_{}_disp.png'.format(opts.single_angle, str(opts.phi))), to8b(disp_np/disp_np.max()))
 
         rgbs = np.stack(rgbs, 0)
+        disp_nps = np.stack(disps, 0)
 
     if single_angle == -1:
         imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.mp4".format(opts.name)), to8b(rgbs), fps=30, quality=8)
         imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.gif".format(opts.name)), to8b(rgbs), duration=0.04)
+
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.mp4".format(opts.name)), to8b(disp_nps/disp_nps.max()), fps=30, quality=8)
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.gif".format(opts.name)), to8b(disp_nps/disp_nps.max()), duration=0.04)
 
 
 def render_worker(rank, opts):
@@ -121,10 +131,10 @@ def render_worker(rank, opts):
 if __name__ == '__main__':
 
     # parser
-    import argparse
+    import configargparse
     from config import get_args_parser
 
-    parser = argparse.ArgumentParser('nerf testing', parents=[get_args_parser()])
+    parser = configargparse.ArgumentParser('nerf testing', parents=[get_args_parser()])
     opts = parser.parse_args()
     opts.world_size = len(opts.gpu_ids)
     opts.num_workers = len(opts.gpu_ids) * 4
