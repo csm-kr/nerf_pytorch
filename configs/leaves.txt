@@ -1,0 +1,10 @@
+name = leaves_10_04
+
+data_type = llff
+data_root = ./data/nerf_llff_data
+data_name = leaves
+
+near = 0.
+far = 1.
+
+N_iters = 200001

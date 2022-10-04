@@ -1,0 +1,10 @@
+name = trex_09_30
+
+data_type = llff
+data_root = ./data/nerf_llff_data
+data_name = trex
+
+near = 0.
+far = 1.
+
+N_iters = 200001

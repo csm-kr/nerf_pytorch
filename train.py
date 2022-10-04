@@ -2,17 +2,13 @@ import os
 import time
 import torch
 import numpy as np
-from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_chunk, mse2psnr, getSSIM, getLPIPS
+from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_chunk, mse2psnr
 
 
 def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, optimizer, criterion,
                      result_best, opts, getter_ray_batch_idx=None):
     model.train()
-
-    epoch = 0
-
-    # ray_o, ray_d is on the cpu
-    # target_img is on the gpu
+    epoch = 0   # only consider llff data due to global batch
 
     if getter_ray_batch_idx is not None and opts.global_batch:
         # batch가 size를 넘어가면 shuffle
@@ -38,23 +34,16 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
 
     # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-
     pred_rgb_c, pred_rgb_f = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # [1024,4]
 
     # update optimizer
     optimizer.zero_grad()
     img_loss_f = criterion(pred_rgb_f, target_img)
     psnr_f = mse2psnr(img_loss_f)
-
-    # getting ssim and lpips for image -> at test.py
-    # ssim = getSSIM()
-    # lpips = getLPIPS()
-
     img_loss_c = criterion(pred_rgb_c, target_img)
     psnr_c = mse2psnr(img_loss_c)
 
     loss = img_loss_c + img_loss_f
-
     loss.backward()
     optimizer.step()
 
@@ -90,10 +79,10 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
             vis.line(X=torch.ones((1, 2)) * i,
                      Y=torch.Tensor([loss, psnr.item()]).unsqueeze(0),
                      update='append',
-                     win='training_loss',
+                     win='train_loss_for_{}'.format(opts.name),
                      opts=dict(x_label='step',
                                y_label='loss',
-                               title='loss',
+                               title='train loss for {}'.format(opts.name),
                                legend=['total_loss', 'psnr']))
     # save checkpoint
     checkpoint = {'idx': i,
