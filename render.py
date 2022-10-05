@@ -110,8 +110,8 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
         imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.mp4".format(opts.name)), to8b(rgbs), fps=30, quality=8)
         imageio.mimwrite(os.path.join(save_render_dir, "{}_rgb.gif".format(opts.name)), to8b(rgbs), duration=0.04)
 
-        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.mp4".format(opts.name)), to8b(disp_nps/disp_nps.max()), fps=30, quality=8)
-        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.gif".format(opts.name)), to8b(disp_nps/disp_nps.max()), duration=0.04)
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.mp4".format(opts.name)), to8b(disp_nps/np.nanmax(disp_nps)), fps=30, quality=8)
+        imageio.mimwrite(os.path.join(save_render_dir, "{}_disp.gif".format(opts.name)), to8b(disp_nps/np.nanmax(disp_nps)), duration=0.04)
 
 
 def render_worker(rank, opts):

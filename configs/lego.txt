@@ -1,4 +1,4 @@
-name = lego_09_27
+name = lego_10_05
 
 data_type = blender
 data_root = ./data/nerf_synthetic
@@ -7,5 +7,5 @@ data_name = lego
 near = 2.
 far = 6.
 
-N_iters = 300001
+N_iters = 200001
 global_batch_false

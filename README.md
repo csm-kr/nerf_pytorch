@@ -90,7 +90,7 @@ We have referenced the following those repos - ofiiclal [code](https://github.co
 | model   |   room    |   fern    |   leaves  |  fortress |  orchids  |  flower   |   t-rex   |   horns   |    mean   |
 |---------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
 | NeRF    | 32.7000   | 25.1700   |  20.92    |  31.1600  | 20.3600   | 27.4000   | 26.8000   | 27.4500   |  26.4950  |  
-| Ours    | 32.9586   | -         |  -        |  31.8662  |  -        | 28.4948   |        -  | -         |  -        |
+| Ours    | 32.9586   | -         |  22.45    |  31.8662  |  -        | 28.4948   |        -  | -         |  -        |
 
 ![flower_gif](figures/llff/flower_09_27_rgb.gif)
 

@@ -34,7 +34,7 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
 
     # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-    pred_rgb_c, pred_rgb_f = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # [1024,4]
+    pred_rgb_c, _, pred_rgb_f, _ = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # [1024,4]
 
     # update optimizer
     optimizer.zero_grad()
