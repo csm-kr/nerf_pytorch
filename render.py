@@ -101,7 +101,7 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
             if not single_angle == -1:
                 imageio.imwrite(os.path.join(save_render_dir, '{}_{}_rgb.png'.format(opts.single_angle, str(opts.phi))), to8b(rgb_np))
-                imageio.imwrite(os.path.join(save_render_dir, '{}_{}_disp.png'.format(opts.single_angle, str(opts.phi))), to8b(disp_np/disp_np.max()))
+                imageio.imwrite(os.path.join(save_render_dir, '{}_{}_disp.png'.format(opts.single_angle, str(opts.phi))), to8b(disp_np/np.nanmax(disp_np)))
 
         rgbs = np.stack(rgbs, 0)
         disp_nps = np.stack(disps, 0)
