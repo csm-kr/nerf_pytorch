@@ -57,7 +57,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
 
             disp = torch.reshape(pred_disp, [img_h, img_w, 1])
             disp_np = disp.cpu().numpy()
-            disp_np = disp_np / disp_np.max()
+            disp_np = disp_np / np.max(disp_np)
 
             rgb8 = to8b(rgb_np)
             dist8 = to8b(disp_np)
