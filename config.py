@@ -30,8 +30,8 @@ def get_args_parser():
     # training
     parser.add_argument("--lr", type=float, default=5e-4)
     parser.add_argument('--batch_size', type=int, default=1024)  # 4096 (official)
-    parser.add_argument('--chunk', type=int, default=4096)       # 32 * 1024 (official)
-    parser.add_argument('--net_chunk', type=int, default=65536)  # 64 * 1024 (official)
+    parser.add_argument('--chunk', type=int, default=4096)       # 32768 (32 * 1024) (official)
+    parser.add_argument('--net_chunk', type=int, default=65536)  # 65536 (64 * 1024) (official)
     parser.add_argument('--num_workers', type=int, default=0)
 
     parser.set_defaults(vis_points_rays=False)

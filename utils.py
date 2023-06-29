@@ -54,7 +54,7 @@ def make_o_d(img_w, img_h, img_k, pose):
     return rays_o, rays_d
 
 
-def sample_rays_and_pixel(rays_o, rays_d, target_img, opts):
+def sample_rays_and_pixels(rays_o, rays_d, target_img, opts):
 
     img_w, img_h = target_img.size()[:2]
     coords = torch.stack(torch.meshgrid(torch.linspace(0, img_h - 1, img_h), torch.linspace(0, img_w - 1, img_w)), -1)  # (H, W, 2)
