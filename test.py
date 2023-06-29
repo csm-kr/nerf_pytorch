@@ -14,7 +14,7 @@ from llff import load_llff_data
 # model
 from model import NeRFs
 from PE import get_positional_encoder
-from utils import mse2psnr, to8b, make_o_d, batchify_rays_and_render_by_chunk, img2mse, getSSIM, getLPIPS
+from utils import mse2psnr, to8b, make_o_d, render_by_chunk, img2mse, getSSIM, getLPIPS
 # render
 from render import render
 
@@ -48,7 +48,7 @@ def test_and_eval(i, i_test, images, poses, hwk, model, fn_posenc, fn_posenc_d, 
         for i, test_pose in enumerate(tqdm(test_poses)):
 
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, test_pose[:3][:4])  # [1]
-            _, _, pred_rgb, pred_disp = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # ** hierachicle sampling **
+            _, _, pred_rgb, pred_disp = render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # ** hierachicle sampling **
             # https://github.com/yenchenlin/nerf-pytorch/blob/63a5a630c9abd62b0f21c08703d0ac2ea7d4b9dd/run_nerf.py#L403
 
             # SAVE test image

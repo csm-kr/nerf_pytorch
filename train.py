@@ -2,7 +2,7 @@ import os
 import time
 import torch
 import numpy as np
-from utils import make_o_d, sample_rays_and_pixel, batchify_rays_and_render_by_chunk, mse2psnr
+from utils import make_o_d, sample_rays_and_pixel, render_by_chunk, mse2psnr
 
 
 def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc_d, vis, optimizer, criterion,
@@ -30,11 +30,11 @@ def train_each_iters(i, i_train, images, poses, hwk, model, fn_posenc, fn_posenc
 
         # make rays_o and rays_d
         rays_o, rays_d = make_o_d(img_w, img_h, img_k, target_pose)                           # [400, 400, 3]
-        rays_o, rays_d, target_img = sample_rays_and_pixel(rays_o, rays_d, target_img, opts)  # [1024,3]
+        rays_o, rays_d, target_img = sample_rays_and_pixel(rays_o, rays_d, target_img, opts)  # [batch_size, 3] x 3
 
     # ** assign target_img to cuda **
     target_img = target_img.to('cuda:{}'.format(opts.gpu_ids[opts.rank]))
-    pred_rgb_c, _, pred_rgb_f, _ = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # [1024,4]
+    pred_rgb_c, _, pred_rgb_f, _ = render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)  # [1024,4]
 
     # update optimizer
     optimizer.zero_grad()

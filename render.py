@@ -13,7 +13,7 @@ from llff import load_llff_data
 # model
 from PE import get_positional_encoder
 from model import NeRFs
-from utils import to8b, batchify_rays_and_render_by_chunk, make_o_d
+from utils import to8b, render_by_chunk, make_o_d
 
 
 def trans_t(t): return torch.Tensor([
@@ -87,7 +87,7 @@ def render(i, hwk, model, fn_posenc, fn_posenc_d, opts, n_angle=40, single_angle
 
             print('RENDERING... idx: {}'.format(i))
             rays_o, rays_d = make_o_d(img_w, img_h, img_k, render_pose[:3, :4])  # [1]
-            _, _, pred_rgb, pred_disp = batchify_rays_and_render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)
+            _, _, pred_rgb, pred_disp = render_by_chunk(rays_o, rays_d, model, fn_posenc, fn_posenc_d, img_h, img_w, img_k, opts)
 
             # save test image rgb
             rgb = torch.reshape(pred_rgb, [img_h, img_w, 3])
