@@ -29,9 +29,9 @@ def get_args_parser():
 
     # training
     parser.add_argument("--lr", type=float, default=5e-4)
-    parser.add_argument('--batch_size', type=int, default=1024)  # 2 ^ 10
-    parser.add_argument('--chunk', type=int, default=4096)       # 2 ^ 12
-    parser.add_argument('--net_chunk', type=int, default=65536)  # 2 ^ 16
+    parser.add_argument('--batch_size', type=int, default=1024)  # 4096 (official)
+    parser.add_argument('--chunk', type=int, default=4096)       # 32 * 1024 (official)
+    parser.add_argument('--net_chunk', type=int, default=65536)  # 64 * 1024 (official)
     parser.add_argument('--num_workers', type=int, default=0)
 
     parser.set_defaults(vis_points_rays=False)
@@ -41,7 +41,7 @@ def get_args_parser():
     parser.set_defaults(global_batch=True)
     parser.add_argument('--global_batch_false', dest='global_batch', action='store_false')
     parser.add_argument('--N_iters', type=int)
-    parser.add_argument('--warmup_iters', type=int, default=10000)
+    parser.add_argument('--warmup_iters', type=int, default=2500)
     parser.add_argument("--N_samples", type=int, default=64, help='number of coarse samples per ray')
     parser.add_argument("--N_importance", type=int, default=128, help='number of additional fine samples per ray')
     parser.add_argument("--perturb", type=float, default=1., help='set to 0. for no jitter, 1. for jitter')
