@@ -138,9 +138,9 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
 
     # 2. run model by net_chunk
     net_chunk = opts.net_chunk
-    outputs_flat = torch.cat([model(embedded[i:i+net_chunk]) for i in range(0, embedded.shape[0], net_chunk)], 0)  # [net_c
-    size = [z_vals.size(0), z_vals.size(1), 4]      # [batch_size, 64, 4]
-    outputs = outputs_flat.reshape(size)
+    outputs_flat = torch.cat([model(embedded[i:i+net_chunk]) for i in range(0, embedded.shape[0], net_chunk)], 0)  # [n_pts, 4]
+    size = [z_vals.size(0), z_vals.size(1), 4]      # [bs, n_samples, 4]
+    outputs = outputs_flat.reshape(size)            # [bs, n_samples, 4]
 
     # 3. post process : render each pixel color by formula (3) in nerf paper
     rgb_map, disp_map, acc_map, weights, depth_map = post_process(outputs, z_vals, rays_d)
@@ -193,7 +193,7 @@ def pre_process(rays, fn_posenc, fn_posenc_d, opts):
     input_pts_flat = input_pts.view(-1, 3)                                # [1024/4096, 64, 3] -> [65536/262144, 3]
     input_pts_embedded = fn_posenc(input_pts_flat)                        # [n_pts, 63]
 
-    input_dirs = viewdirs.unsqueeze(1).expand(input_pts.size())           # [4096, 3] -> [4096, 1, 3]-> [4096, 64, 3]
+    input_dirs = viewdirs.unsqueeze(1).expand(input_pts.size())           # [bs, 3] -> [bs, 1, 3]-> [bs, n_samples, 3]
     input_dirs_flat = input_dirs.reshape(-1, 3)                           # [n_pts, 3]
     input_dirs_embedded = fn_posenc_d(input_dirs_flat)                    # [n_pts, 27]
 
