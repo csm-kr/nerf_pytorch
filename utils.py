@@ -93,8 +93,8 @@ def visualize_points_and_rays(flat_ray_o, flat_ray_d):
     plt.show()
 
 
-def batchify_rays_and_render_by_chunk(ray_o, ray_d, model, fn_posenc, fn_posenc_d, H, W, K, opts):
-    flat_ray_o, flat_ray_d = ray_o.view(-1, 3), ray_d.view(-1, 3)  # [640000, 3], [640000, 3]
+def render_by_chunk(ray_o, ray_d, model, fn_posenc, fn_posenc_d, H, W, K, opts):
+    flat_ray_o, flat_ray_d = ray_o.view(-1, 3), ray_d.view(-1, 3)  # train : [batch_size, 3] / test :  [640000, 3]
     if opts.vis_points_rays:
         visualize_points_and_rays(flat_ray_o, flat_ray_d)
 
@@ -137,9 +137,9 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
     embedded, z_vals, rays_d = pre_process(rays, fn_posenc, fn_posenc_d, opts)
 
     # 2. run model by net_chunk
-    chunk = opts.net_chunk
-    outputs_flat = torch.cat([model(embedded[i:i+chunk]) for i in range(0, embedded.shape[0], chunk)], 0)  # [net_c
-    size = [z_vals.size(0), z_vals.size(1), 4]      # [4096, 64, 4]
+    net_chunk = opts.net_chunk
+    outputs_flat = torch.cat([model(embedded[i:i+net_chunk]) for i in range(0, embedded.shape[0], net_chunk)], 0)  # [net_c
+    size = [z_vals.size(0), z_vals.size(1), 4]      # [batch_size, 64, 4]
     outputs = outputs_flat.reshape(size)
 
     # 3. post process : render each pixel color by formula (3) in nerf paper
@@ -152,7 +152,7 @@ def render_rays(rays, model, fn_posenc, fn_posenc_d, opts):
         embedded_fine, z_vals_fine, rays_d = pre_process_for_hierarchical(rays, z_vals, weights, fn_posenc, fn_posenc_d, opts)
 
         # 5. run model by net_chunk
-        outputs_fine_flat = torch.cat([model(embedded_fine[i:i + chunk], is_fine=True) for i in range(0, embedded_fine.shape[0], chunk)], 0)
+        outputs_fine_flat = torch.cat([model(embedded_fine[i:i + net_chunk], is_fine=True) for i in range(0, embedded_fine.shape[0], net_chunk)], 0)
         size_fine = [z_vals_fine.size(0), z_vals_fine.size(1), 4]  # [4096, 64 + 128, 4]
         outputs_fine = outputs_fine_flat.reshape(size_fine)
 
