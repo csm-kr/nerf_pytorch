@@ -62,7 +62,7 @@ def main_worker(rank, opts):
         first_cycle_steps=num_steps,
         cycle_mult=1.,
         max_lr=opts.lr,
-        min_lr=5e-5,
+        min_lr=5e-6,
         warmup_steps=warmup_steps
         )
 
